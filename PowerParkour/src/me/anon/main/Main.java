@@ -23,20 +23,20 @@ public class Main extends JavaPlugin {
 	PlayerDataLoader pdl;
 	
 	public FileConfiguration config;
-	static public ArrayList<ParkourLevel> LEVELS = new ArrayList<ParkourLevel>();
-	static public HashMap<UUID,ParkourPlayer> PLAYERS = new HashMap<UUID,ParkourPlayer>();
-	public static HashMap<UUID,Long> times = new HashMap<UUID,Long>();
+	static public ArrayList<ParkourLevel> LEVELS = new ArrayList<>();
+	static public HashMap<UUID,ParkourPlayer> PLAYERS = new HashMap<>();
+	public static HashMap<UUID,Long> times = new HashMap<>();
 	
 	public static String readableTimeUnits(Long millis) {
 		
 		long sec = Math.floorDiv(millis, 1000L);
-		Long dispsec = sec % 60;
-		String dispsec2 = dispsec.toString();
+		long dispsec = sec % 60;
+		String dispsec2 = Long.toString(dispsec);
 		if (dispsec2.length() < 2) {
 			dispsec2 = "0" + dispsec2; 
 		}
-		Long min = Math.floorDiv(sec, 60L);
-		String min2 = min.toString();
+		long min = Math.floorDiv(sec, 60L);
+		String min2 = Long.toString(min);
 		if (min2.length() < 2) {
 			min2 = "0" + min2;
 		}
@@ -57,30 +57,25 @@ public class Main extends JavaPlugin {
 		saveDefaultConfig();
 		saveConfig();
 		pdl = new PlayerDataLoader(this);
-		Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
-			 
-		    @Override
-		    public void run() {
-		       for (Entry<UUID,Long> i : times.entrySet()) {
-		    	   if (Bukkit.getPlayer(i.getKey()) != null) {
-		    		   ActionBarManager.ActionBar(ChatColor.GOLD + "Time: " + ChatColor.WHITE + readableTimeUnits(System.currentTimeMillis() - i.getValue()), Bukkit.getPlayer(i.getKey()));
-		    	   }
-		       }
-		       
-		       if (ChunkManager.blockchanges.size() > 0) {
-		    	   ChunkManager.performUpdates(20);
-		       }
-		       DailyChallenges.runUpdate(false);
-		       
-		    }
-		 
+		Bukkit.getScheduler().scheduleSyncRepeatingTask(this, () -> {
+		   for (Entry<UUID,Long> i : times.entrySet()) {
+			   if (Bukkit.getPlayer(i.getKey()) != null) {
+				   ActionBarManager.ActionBar(ChatColor.GOLD + "Time: " + ChatColor.WHITE + readableTimeUnits(System.currentTimeMillis() - i.getValue()), Bukkit.getPlayer(i.getKey()));
+			   }
+		   }
+
+		   if (ChunkManager.blockchanges.size() > 0) {
+			   ChunkManager.performUpdates(20);
+		   }
+		   DailyChallenges.runUpdate(false);
+
 		}, 1L , 5);
 		
 		
 	}
 	
 	public static HashMap<Integer,ArrayList<Long>> getEmptyCompMap() {
-		HashMap<Integer,ArrayList<Long>> map = new HashMap<Integer,ArrayList<Long>>();
+		HashMap<Integer,ArrayList<Long>> map = new HashMap<>();
 		int ii = 0;
 		for (ParkourLevel i : LEVELS) {
 			map.put(ii, new ArrayList<>());
@@ -163,7 +158,9 @@ public class Main extends JavaPlugin {
 					sender.sendMessage("§aThis person now has PLUS.");
 					
 					if (Bukkit.getPlayer(args[0]) != null) {
-						Bukkit.getPlayer(args[0]).sendMessage("§aYou have become a §6§lPLUS §amember! Congratulations! \n§fTo receive the full benefits of the package, please re-log onto the server.\n\n§a§lThanks for your support!");
+						Bukkit.getPlayer(args[0]).sendMessage("§aYou have become a §6§lPLUS §amember! Congratulations! " +
+								"\n§fTo receive the full benefits of the package, please re-log onto the server." +
+								"\n\n§a§lThanks for your support!");
 					}
 					
 				} else sender.sendMessage("§cPlayer not found.");
@@ -222,7 +219,7 @@ public class Main extends JavaPlugin {
 			}
 			if (args.length == 1) {
 				if (times.containsKey(((Player) sender).getUniqueId())) {
-					Long time = System.currentTimeMillis() - times.get(((Player) sender).getUniqueId());
+					long time = System.currentTimeMillis() - times.get(((Player) sender).getUniqueId());
 					//sender.sendMessage("Timing ended! Your time was " + readableTimeUnits(time));
 					
 					if (Main.PLAYERS.get(((Player)sender).getUniqueId()).getLocation() == -3) {
