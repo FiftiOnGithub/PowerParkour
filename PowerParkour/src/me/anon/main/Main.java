@@ -15,8 +15,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-
-
+import org.jetbrains.annotations.NotNull;
 
 
 public class Main extends JavaPlugin {
@@ -53,7 +52,6 @@ public class Main extends JavaPlugin {
 	public void onEnable() {
 
 		PluginManager pm = Bukkit.getServer().getPluginManager();
-		pm.addPermission(new Permission("entitydelete.sduse"));
 		pm.registerEvents(new EventsManager(), this);
 		config = getConfig();
 		saveDefaultConfig();
@@ -82,7 +80,7 @@ public class Main extends JavaPlugin {
 	}
 	
 	public static HashMap<Integer,ArrayList<Long>> getEmptyCompMap() {
-		HashMap<Integer,ArrayList<Long>> map = new HashMap<Integer,ArrayList<>>();
+		HashMap<Integer,ArrayList<Long>> map = new HashMap<Integer,ArrayList<Long>>();
 		int ii = 0;
 		for (ParkourLevel i : LEVELS) {
 			map.put(ii, new ArrayList<>());
@@ -91,7 +89,7 @@ public class Main extends JavaPlugin {
 		return map;
 	}
 	
-	public static void advertisePlus(Player p) {
+	public static void advertisePlus(@NotNull Player p) {
 		p.sendMessage("Interested in §6§lPLUS§f?"
 				+ "\n§fPLUS is a §blifetime §fpurchase, which you make once and benefit from"
 				+ " for as long as you play on our network. The price of PLUS is §b5.00$"
