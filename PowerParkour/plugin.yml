@@ -1,0 +1,43 @@
+name: PowerParkour
+main: me.anon.main.Main
+version: 1.0
+commands:
+    start:
+       description: start timer.
+       usage: /start
+    endparkour: 
+       description: end timer.
+       usage: /end <id>
+    leveldebug:
+       description: debug levels
+       usage: /leveldebug
+    parkourmenu:
+       description: menu for parkour
+       usage: /parkourmenu
+    practice:
+       description: practice mode
+       usage: /practice
+    plus:
+       description: Get information about the server's PLUS membership
+       usage: /plus
+    testchunkcopy:
+       description: Tests chunk copying
+       usage: /testchunkcopy
+    blockme:
+       description: tests block state change
+       usage: /blockme
+    forcedaily:
+       description: force daily update
+       usage: /forcedaily
+    grantplus:
+       description: grant plus to a player
+       usage: /grantplus <ign>
+    myloc:
+       description: get your location in the server's eyes
+       usage: /myloc
+    voteinternal:
+       description: voting internal command
+       usage: /voteinternal <username>
+    dailytop:
+       description: top daily lb
+       usage: /dailytop

@@ -1,0 +1,28 @@
+levels:
+   0:
+      name: "Chapter 1"
+      chestPos: 11
+      condition: 0
+      location: "DEVCH"
+      goldTime: 5000
+   1:
+      name: "Chapter 2"
+      chestPos: 12
+      condition: 1
+      location: "DEVCH"
+      goldTime: 3000
+   2:
+      name: "Obelisk"
+      chestPos: 40
+      condition: 2
+      location: "DEVCH"
+      goldTime: 10000
+daily:
+   lastDaily: 0
+   currentDaily:
+      one: 1
+      two: 1
+      three: 1
+      four: 1
+      five: 1
+   mapsPerType: 1
