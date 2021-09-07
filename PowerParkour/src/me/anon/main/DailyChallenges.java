@@ -41,12 +41,8 @@ public class DailyChallenges {
 				Location targetLocation = Bukkit.getWorld("LOBBY").getSpawnLocation();
 				for (Player p : Bukkit.getWorld("DC_WORLD").getPlayers()) {
 					p.sendMessage("§cThe time on the Daily Challenge has ran out. You will be moved to the lobby while the next daily challenge is prepared.");
-					p.teleport(targetLocation);
-					Main.times.remove(p.getUniqueId());
 					ParkourPlayer pp = Main.PLAYERS.get(p.getUniqueId());
-					pp.setLocation(-1);
-					pp.setFails(0);
-					pp.setPracMode(false);
+					pp.sendPlayerToLocation(-1);
 				}
 				World from = Bukkit.getWorld("DC_COPY");
 				World to = Bukkit.getWorld("DC_WORLD");
@@ -76,13 +72,12 @@ public class DailyChallenges {
 	}
 	
 	public static long timeTillNextChallenge() {
-		long timeTill = lastdaily - (System.currentTimeMillis() - 86400000);
-		return timeTill;
+		return lastdaily - (System.currentTimeMillis() - 86400000);
 	}
 	
 	public static String getTop() {
 		String result = "";
-		Map<String,Long> unsorted = new HashMap<String,Long>();
+		Map<String,Long> unsorted = new HashMap<>();
 		for (Entry<UUID,ParkourPlayer> i : Main.PLAYERS.entrySet()) {
 			if (i.getValue().getDailyTime() != 0) {
 				unsorted.put(i.getValue().getLastKnownName(), i.getValue().getDailyTime());
@@ -100,7 +95,7 @@ public class DailyChallenges {
 	}
 	public static int getPos(UUID u) {
 		if (Main.PLAYERS.get(u).getDailyTime() < 1) return 0;
-		Map<UUID,Long> unsorted = new HashMap<UUID,Long>();
+		Map<UUID,Long> unsorted = new HashMap<>();
 		for (Entry<UUID,ParkourPlayer> i : Main.PLAYERS.entrySet()) {
 			if (i.getValue().getDailyTime() != 0) {
 				unsorted.put(i.getKey(), i.getValue().getDailyTime());

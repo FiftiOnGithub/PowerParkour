@@ -1,8 +1,6 @@
 package me.anon.main;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
@@ -13,10 +11,10 @@ import org.bukkit.World;
 
 public class ChunkManager {
 	
-	static HashMap<Location,Material> blockchanges = new HashMap<Location,Material>();
+	static HashMap<Location,Material> blockchanges = new HashMap<>();
 	
 	
-	public static boolean copyChunk(World worldFrom,int fromX,int fromZ,World worldTo,int toX, int toZ) {
+	public static void copyChunk(World worldFrom, int fromX, int fromZ, World worldTo, int toX, int toZ) {
 		// the daily challenge chunks have some very specific rules in order to cut down on processing time. Only blocks at y35 or above are copied, and only blocks at y50 or below are copied.
 		Chunk from = worldFrom.getChunkAt(fromX, fromZ);
 		System.out.println(from.getX());
@@ -38,13 +36,12 @@ public class ChunkManager {
 			}
 		}
 		System.out.println("Blockchanges size: " + blockchanges.size());
-		return true;
 	}
 	
 	public static void performUpdates(int num) {
 		System.out.println("Starting block updates");
 		int i = 0;
-		ArrayList<Location> tbr = new ArrayList<Location>();
+		ArrayList<Location> tbr = new ArrayList<>();
 		for (Entry<Location,Material> block : blockchanges.entrySet()) {
 			if (!block.getKey().getChunk().isLoaded()) block.getKey().getChunk().load();
 			block.getKey().getBlock().setType(block.getValue());

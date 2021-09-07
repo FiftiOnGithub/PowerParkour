@@ -16,7 +16,7 @@ public class ParkourGUI {
 		for (ParkourLevel i : Main.LEVELS) {
 			{
 				String displayName = "§5§lBUG HAPPENED!";
-				ArrayList<String> lore = new ArrayList<String>();
+				ArrayList<String> lore = new ArrayList<>();
 				Material mat = Material.COMMAND;
 				if (p.getFeats().get(ii).size() > 0) {
 					if (p.hasGold(ii)) {
@@ -32,36 +32,35 @@ public class ParkourGUI {
 				} else {
 					int cpl = p.canPlayLevel(ii);
 					switch (cpl) {
-						case 0:
+						case 0 -> {
 							mat = Material.EMERALD;
-							displayName = "§a§l"+i.getName();
+							displayName = "§a§l" + i.getName();
 							lore.add("§aYou can play this level right now!");
 							lore.add("§aClick here to enter!");
-							break;
-						case 1:
+						}
+						case 1 -> {
 							mat = Material.WOOD_BUTTON;
-							displayName = "§e§l"+i.getName();
+							displayName = "§e§l" + i.getName();
 							lore.add("§cYou haven't yet completed");
 							lore.add("§cthe level before this!");
-							break;
-						case 2:
+						}
+						case 2 -> {
 							mat = Material.STONE_PLATE;
-							displayName = "§6§l"+i.getName();
+							displayName = "§6§l" + i.getName();
 							lore.add("§cTo play this level,");
 							lore.add("§cyou need to get a §6§lGold star");
 							lore.add("§cin every other level (except plus ones)");
-							break;
-						case 3:
+						}
+						case 3 -> {
 							mat = Material.STONE_BUTTON;
-							displayName = "§b§l"+i.getName();
+							displayName = "§b§l" + i.getName();
 							lore.add("§cThis level is for §6PLUS §crank only.");
 							lore.add("§cTo learn more about §6PLUS§c, do /plus");
-							break;
-						case 4:
-							mat = Material.COMMAND;
-							displayName = "§4§l"+i.getName();
+						}
+						case 4 -> {
+							displayName = "§4§l" + i.getName();
 							lore.add("§4A bug has happened. Contact admins about this with the level name and your username.");
-							break;
+						}
 					}
 				}
 			 	ItemStack item = new ItemStack(mat);
@@ -79,7 +78,7 @@ public class ParkourGUI {
 		ItemStack lobbyItem = new ItemStack(Material.FEATHER);
 		ItemMeta lm = lobbyItem.getItemMeta();
 		lm.setDisplayName("§c§lReturn to Hub");
-		ArrayList<String> lore = new ArrayList<String>();
+		ArrayList<String> lore = new ArrayList<>();
 		lore.add("§7Returns you to the PowerParkour Hub.");
 		lore.add("§a");
 		lore.add("§7"+-1);
@@ -92,7 +91,7 @@ public class ParkourGUI {
 		ItemStack PlusItem = new ItemStack(Material.GOLD_INGOT);
 		ItemMeta pm = PlusItem.getItemMeta();
 		pm.setDisplayName("§a§lLearn about §6§lPLUS");
-		ArrayList<String> plore = new ArrayList<String>();
+		ArrayList<String> plore = new ArrayList<>();
 		plore.add("§7Our server offers the ability for you to purchase §6§lPLUS");
 		plore.add("§7membership using real life money. Some of the features are:");
 		plore.add("§7- Access to §bPractice Mode");
@@ -111,10 +110,10 @@ public class ParkourGUI {
 		ItemStack DCItem = new ItemStack(Material.WATCH);
 		ItemMeta dcm = DCItem.getItemMeta();
 		dcm.setDisplayName("§b§lDaily Challenge");
-		ArrayList<String> dlore = new ArrayList<String>();
+		ArrayList<String> dlore = new ArrayList<>();
 		
 		dlore.add("§7The daily challenge is a parkour level that");
-		double htnc = Math.floor(DailyChallenges.timeTillNextChallenge() / 3600000);
+		double htnc = Math.floor(DailyChallenges.timeTillNextChallenge() / 3600000f);
 		String tts = "§a" + htnc + " hour(s)";
 		if (htnc < 1.0D) tts =  "§aless than 1 hour";
 		dlore.add("§7changes every day. The next change will happen in " + tts + "§7.");

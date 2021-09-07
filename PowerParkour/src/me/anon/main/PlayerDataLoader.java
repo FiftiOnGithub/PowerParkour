@@ -35,12 +35,12 @@ public class PlayerDataLoader {
 				
 				UUID uuid = UUID.fromString(i);
 				
-				HashMap<Integer,ArrayList<Long>> feats = new HashMap<Integer,ArrayList<Long>>();
+				HashMap<Integer,ArrayList<Long>> feats = new HashMap<>();
 				for (String ii : pdm.getConfig().getConfigurationSection("players."+i+".feats").getKeys(false)) {
 					List<Integer> lint = pdm.getConfig().getIntegerList("players."+i+".feats."+ii);
-					ArrayList<Long> comps = new ArrayList<Long>();
+					ArrayList<Long> comps = new ArrayList<>();
 					for (Integer inti : lint) {
-						comps.add(new Long(inti));
+						comps.add(Long.valueOf(inti));
 					}
 					feats.put(Integer.parseInt(ii), comps);
 				}
@@ -54,11 +54,12 @@ public class PlayerDataLoader {
 				long dailyTime = pdm.getConfig().getLong("players."+i+".dailyTime");
 				String lnn = pdm.getConfig().getString("players."+i+".username");
 				new ParkourPlayer(uuid,feats,plus,dailyLives,dailyStreak,dailyTime,lnn);
-				System.out.println("Loaded " + uuid.toString() + ". They have " + feats.size() + " feats.");
+				System.out.println("Loaded " + uuid + ". They have " + feats.size() + " feats.");
 				
 			}
 		}
 		
+		// daily challenge information
 		// daily challenge information
 		ConfigurationSection daily = m.config.getConfigurationSection("daily");
 		DailyChallenges.lastdaily = daily.getLong("lastDaily");
@@ -74,11 +75,11 @@ public class PlayerDataLoader {
 	}
 	public void saveData() {
 		System.out.println("Starting data save");
-		for (Entry<UUID,ParkourPlayer> ent : main.PLAYERS.entrySet()) {
+		for (Entry<UUID, ParkourPlayer> ent : Main.PLAYERS.entrySet()) {
 			pdm.getConfig().set("players."+ent.getKey().toString()+".hasPlus", ent.getValue().hasPlus());
 			pdm.getConfig().set("players."+ent.getKey().toString()+".dailyLives", ent.getValue().getLives());
 			for (Entry<Integer,ArrayList<Long>> comp : ent.getValue().getFeats().entrySet()) {
-				List<Integer> lint = new ArrayList<Integer>();
+				List<Integer> lint = new ArrayList<>();
 
 				for (Long ic : comp.getValue()) {
 					lint.add(ic.intValue());

@@ -13,7 +13,7 @@ public class PlayerDataManager {
 		 
 	    private final String fileName;
 	    private final JavaPlugin plugin;
-	    private File configFile;
+	    private final File configFile;
 	    private FileConfiguration fileConfiguration;
 	 
 	    @SuppressWarnings("deprecation")
@@ -51,7 +51,6 @@ public class PlayerDataManager {
 	 
 	    public void saveConfig() {
 	        if (fileConfiguration == null || configFile == null) {
-	            return;
 	        } else {
 	            try {
 	                getConfig().save(configFile);

@@ -3,16 +3,20 @@ package me.anon.main;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryEvent;
+import org.bukkit.event.inventory.InventoryMoveItemEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+
+import java.util.Objects;
 
 public class EventsManager implements Listener {
 
@@ -24,7 +28,7 @@ public class EventsManager implements Listener {
 			e.getPlayer().sendMessage("§rWelcome back to ParkourPower. Hopefully you have a good time :D");
 			e.getPlayer().sendMessage("§b>");
 			ParkourPlayer p = Main.PLAYERS.get(e.getPlayer().getUniqueId());
-			if (p.getLastKnownName() != e.getPlayer().getName()) p.setLastKnownName(e.getPlayer().getName());
+			if (!Objects.equals(p.getLastKnownName(), e.getPlayer().getName())) p.setLastKnownName(e.getPlayer().getName());
 			if (p.getDailyTime() == 0) {
 				e.getPlayer().sendMessage("§aYou haven't completed today's daily challenge yet! To play the daily challenge, click the clock in the parkour menu!");
 			}
@@ -45,21 +49,15 @@ public class EventsManager implements Listener {
 			e.setCancelled(true);
 			if (!e.getCurrentItem().hasItemMeta()) return;
 			if (e.getCurrentItem().getItemMeta().hasLore()) {
-				Integer levelid = Integer.parseInt(e.getCurrentItem().getItemMeta().getLore().get(e.getCurrentItem().getItemMeta().getLore().size()-1).substring(2));
+				int levelid = Integer.parseInt(e.getCurrentItem().getItemMeta().getLore().get(e.getCurrentItem().getItemMeta().getLore().size()-1).substring(2));
 				Player p = (Player) e.getWhoClicked();
 				ParkourPlayer pp = Main.PLAYERS.get(p.getUniqueId());
 				//((Player) e.getWhoClicked()).sendMessage(levelid + " - " + Main.LEVELS.get(levelid).getName());
 				if (levelid < 0) {
 					if (levelid == -1) {
 						// return to lobby
-						p.teleport(Bukkit.getWorld("LOBBY").getSpawnLocation());
 						p.sendMessage("§aYou have been returned to the lobby.");
-						if (Main.times.get(p.getUniqueId()) != null) {
-							Main.times.remove(p.getUniqueId());
-						}
-						pp.setLocation(-1);
-						pp.setFails(0);
-						pp.setPracMode(false);
+						pp.sendPlayerToLocation(-1);
 						return;
 					}
 					if (levelid == -2) {
@@ -68,32 +66,15 @@ public class EventsManager implements Listener {
 						return;
 					}
 					if (levelid == -3) {
-						if (pp.getLives() > 0) {
-							Location movloc = Bukkit.getWorld("DC_WORLD").getSpawnLocation();
-							movloc.setPitch(0);
-							movloc.setYaw(-90);
-							Main.times.remove(p.getUniqueId());
-							Main.times.put(p.getUniqueId(),System.currentTimeMillis());
-							e.getWhoClicked().teleport(movloc);
-							pp.setLocation(-3);
-							if (pp.getLives() < 100) p.sendMessage("§aDaily challenge started! You have §4" + pp.getLives() + "§a lives."); else p.sendMessage("§aDaily challenge started! You have §4 infinite§a lives.");
-						} else p.sendMessage("§cYou're out of lives! To get more, you can §b§lVOTE §cfor our server. §7(Click here)");
+						pp.sendPlayerToLocation(-3);
 						return;
 						
 					}
 					return;
 				}
 				if (pp.canPlayLevel(levelid) == 0) {
-				if (p.teleport(Bukkit.getWorld(Main.LEVELS.get(levelid).getLocation()).getSpawnLocation())) {
-					Main.times.remove(p.getUniqueId());
-					Main.times.put(p.getUniqueId(), System.currentTimeMillis());
-					pp.setLocation(levelid);
-					pp.setFails(0);
-					p.sendMessage("§aYou have started " + Main.LEVELS.get(levelid).getName() + "! Good luck :)");
-				} else {
-					p.sendMessage("§cAn error took place while teleporting you to that location. Please contact a staff member.");
-					return;
-				}
+				pp.sendPlayerToLocation(levelid);
+				p.sendMessage("§aYou have started " + Main.LEVELS.get(levelid).getName() + "! Good luck :)");
 				} else p.sendMessage("§cYou can't play this level!");
 			}
 		}
@@ -114,6 +95,27 @@ public class EventsManager implements Listener {
 	@EventHandler
 	public void EntityDamageEvent(org.bukkit.event.entity.EntityDamageEvent e) {
 		e.setCancelled(true);
+	}
+
+	@EventHandler
+	public void PlayerInventoryMoveEvent(InventoryEvent e) {
+		System.out.println("Inventory Event! More specifically: " + e.getEventName() + ". Inventory Name: " + e.getInventory().getName() + ". Inventory 'title': " + e.getInventory().getTitle() + ". Inventory owner: " + e.getInventory().getViewers().get(0).getName() + ".");
+	}
+
+	@EventHandler
+	public void PlayerInteractEvent(PlayerInteractEvent e) {
+		System.out.println("PlayerInteractEvent!");
+		ParkourPlayer player = Main.PLAYERS.get(e.getPlayer().getUniqueId());
+		if (player.getLocation() >= 0) {
+			// Return to lobby
+			if (e.getItem().getType() == Material.IRON_DOOR_BLOCK) {
+
+			}
+			// More options
+			if (e.getItem().getType() == Material.NETHER_STAR) {
+
+			}
+		}
 	}
 	@EventHandler 
 	public void AsyncPlayerChatEvent(org.bukkit.event.player.AsyncPlayerChatEvent e) {
@@ -138,15 +140,10 @@ public class EventsManager implements Listener {
 			if (pp.getLocation() == -3) {
 				if (!(pp.getLives() > 100)) pp.setLives(pp.getLives() - 1);
 				if (pp.getLives() == 0) {
-					pp.setLocation(-1);
-					pp.setFails(0);
-					pp.setPracMode(false);
-					e.getPlayer().teleport(Bukkit.getWorld("LOBBY").getSpawnLocation());
-					Main.times.remove(e.getPlayer().getUniqueId());
+					pp.sendPlayerToLocation(-1);
 					
 					e.getPlayer().sendMessage("§bYou ran out of lives!"
 							+ "\n§fYou've run out of lives. The daily challenge has a limited number of lives. If you want to try the challenge as many times as you want, you can always §b§lVOTE§f for our server. It's completely free and helps our server a lot!");
-					return;
 				} else {
 					if (pp.getLives() > 100) e.getPlayer().sendMessage("§cYou died! §fSince you've voted, you didn't lose any lives.."); else e.getPlayer().sendMessage("§cYou died! §fYou lost a life. You now have §4" + pp.getLives() + "§f lives remaining.");
 					
@@ -156,8 +153,8 @@ public class EventsManager implements Listener {
 					movloc.setPitch(0);
 					movloc.setYaw(-90);
 					e.getPlayer().teleport(movloc);
-					return;
 				}
+				return;
 			}
 			
 			
@@ -171,11 +168,12 @@ public class EventsManager implements Listener {
 			Main.times.put(e.getPlayer().getUniqueId(),System.currentTimeMillis());
 			pp.setFails(pp.getFails() + 1);
 			if (pp.getFails() % 20 == 0) {
-				e.getPlayer().sendMessage("§a> §3§lHaving trouble?"
-						+ "\n§a> §6§lPLUS §rusers are able to use §bPractice Mode §rwhich"
-						+ "\n§a> §rallows them to respawn right on the jump they fell."
-						+ "\n§a> §bPractice Mode §rcompletions do not count as completions though."
-						+ "\n§a> §rTo learn more about §6§lPLUS§r do §b/plus§r.");
+				e.getPlayer().sendMessage("""
+						§a> §3§lHaving trouble?
+						§a> §6§lPLUS §rusers are able to use §bPractice Mode §rwhich
+						§a> §rallows them to respawn right on the jump they fell.
+						§a> §bPractice Mode §rcompletions do not count as completions though.
+						§a> §rTo learn more about §6§lPLUS§r do §b/plus§r.""");
 			}
 			return;
 			}

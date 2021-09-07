@@ -9,13 +9,13 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.permissions.Permission;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.jetbrains.annotations.NotNull;
 
 
 public class Main extends JavaPlugin {
@@ -23,12 +23,11 @@ public class Main extends JavaPlugin {
 	PlayerDataLoader pdl;
 	
 	public FileConfiguration config;
-	static public ArrayList<ParkourLevel> LEVELS = new ArrayList<>();
-	static public HashMap<UUID,ParkourPlayer> PLAYERS = new HashMap<>();
-	public static HashMap<UUID,Long> times = new HashMap<>();
+	static public ArrayList<ParkourLevel> LEVELS = new ArrayList<ParkourLevel>();
+	public static HashMap<UUID,ParkourPlayer> PLAYERS = new HashMap<UUID,ParkourPlayer>();
+	public static HashMap<UUID,Long> times = new HashMap<UUID, Long>();
 	
 	public static String readableTimeUnits(Long millis) {
-		
 		long sec = Math.floorDiv(millis, 1000L);
 		long dispsec = sec % 60;
 		String dispsec2 = Long.toString(dispsec);
@@ -70,30 +69,45 @@ public class Main extends JavaPlugin {
 		   DailyChallenges.runUpdate(false);
 
 		}, 1L , 5);
-		
+
+
 		
 	}
-	
+
+	public static void setPlayerInventory(Player p) {
+		// Creating player in game inventory content
+		ItemStack nether_star = new ItemStack(Material.NETHER_STAR);
+		ItemMeta nether_star_item_meta = nether_star.getItemMeta();
+		nether_star_item_meta.setDisplayName("§e§lMore Options §7(Right Click)");
+		nether_star.setItemMeta(nether_star_item_meta);
+		p.getInventory().setItem(45,nether_star);
+
+		ItemStack iron_door = new ItemStack(Material.IRON_DOOR);
+		ItemMeta iron_door_item_meta = iron_door.getItemMeta();
+		iron_door_item_meta.setDisplayName("§cReturn to Lobby §7(Right Click)");
+		iron_door.setItemMeta(iron_door_item_meta);
+		p.getInventory().setItem(44,iron_door);
+	}
+
 	public static HashMap<Integer,ArrayList<Long>> getEmptyCompMap() {
 		HashMap<Integer,ArrayList<Long>> map = new HashMap<>();
 		int ii = 0;
-		for (ParkourLevel i : LEVELS) {
+		for (ParkourLevel ignored : LEVELS) {
 			map.put(ii, new ArrayList<>());
 			ii++;
 		}
 		return map;
 	}
 	
-	public static void advertisePlus(@NotNull Player p) {
-		p.sendMessage("Interested in §6§lPLUS§f?"
-				+ "\n§fPLUS is a §blifetime §fpurchase, which you make once and benefit from"
-				+ " for as long as you play on our network. The price of PLUS is §b5.00$"
-				+ "§f. For that price, you get:"
-				+ "\n- §bPractice Mode"
-				+ "\n§f- Special §f[§6§lP§r§f] tag in chat and the tab list"
-				+ "\n§f- Join announcements"
-				+ "\n§f- Extra daily challenge lives"
-				+ "\n§f- 3 more full parkour levels");
+	public static void advertisePlus(Player p) {
+		p.sendMessage("""
+				Interested in §6§lPLUS§f?
+				§fPLUS is a §blifetime §fpurchase, which you make once and benefit from for as long as you play on our network. The price of PLUS is §b5.00$§f. For that price, you get:
+				- §bPractice Mode
+				§f- Special §f[§6§lP§r§f] tag in chat and the tab list
+				§f- Join announcements
+				§f- Extra daily challenge lives
+				§f- 3 more full parkour levels""");
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -158,9 +172,11 @@ public class Main extends JavaPlugin {
 					sender.sendMessage("§aThis person now has PLUS.");
 					
 					if (Bukkit.getPlayer(args[0]) != null) {
-						Bukkit.getPlayer(args[0]).sendMessage("§aYou have become a §6§lPLUS §amember! Congratulations! " +
-								"\n§fTo receive the full benefits of the package, please re-log onto the server." +
-								"\n\n§a§lThanks for your support!");
+						Bukkit.getPlayer(args[0]).sendMessage("""
+								§aYou have become a §6§lPLUS §amember! Congratulations!\s
+								§fTo receive the full benefits of the package, please re-log onto the server.
+
+								§a§lThanks for your support!""");
 					}
 					
 				} else sender.sendMessage("§cPlayer not found.");
@@ -229,11 +245,7 @@ public class Main extends JavaPlugin {
 							if (pp.getDailyTime() > time) pp.setDailyTime(time);
 						} else pp.setDailyTime(time);
 						pp.setDailyStreak(pp.getDailyStreak() + 1);
-						Main.times.remove(pp.getUUID());
-						pp.setLocation(-1);
-						pp.setFails(0);
-						pp.setPracMode(false);
-						((Player)sender).teleport(Bukkit.getWorld("LOBBY").getSpawnLocation());
+						pp.sendPlayerToLocation(-1);
 						return true;
 					}
 					

@@ -2,11 +2,11 @@ package me.anon.main;
 
 public class ParkourLevel {
 	
-	private String name;
-	private Integer condition;
-	private Integer chestPos;
-	private String location;
-	private long goldTime;
+	private final String name;
+	private final Integer condition;
+	private final Integer chestPos;
+	private final String location;
+	private final long goldTime;
 	
 	public ParkourLevel(String n,Integer co,Integer cp,String loc,long gt) {
 		this.name = n;
