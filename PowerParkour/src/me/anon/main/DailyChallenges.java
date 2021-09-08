@@ -39,17 +39,17 @@ public class DailyChallenges {
 				CD5 = r.nextInt(rmpt+1);
 				System.out.println("Generated new daily challenge: " + CD1 + ","+ CD2 + ","+ CD3 + ","+ CD4 + ","+ CD5 + ". RMPT: " + rmpt);
 				for (Player p : Bukkit.getWorld("DC_WORLD").getPlayers()) {
-					p.sendMessage("§cThe time on the Daily Challenge has ran out. You will be moved to the lobby while the next daily challenge is prepared.");
+					p.sendMessage("Â§cThe time on the Daily Challenge has ran out. You will be moved to the lobby while the next daily challenge is prepared.");
 					ParkourPlayer pp = Main.PLAYERS.get(p.getUniqueId());
 					pp.sendPlayerToLocation(-1);
 				}
 				World from = Bukkit.getWorld("DC_COPY");
 				World to = Bukkit.getWorld("DC_WORLD");
-				ChunkManager.copyChunk(from, CD1, 0, to, 1, 0);
-				ChunkManager.copyChunk(from, CD2, 1, to, 2, 0);
-				ChunkManager.copyChunk(from, CD3, 2, to, 3, 0);
-				ChunkManager.copyChunk(from, CD4, 3, to, 4, 0);
-				ChunkManager.copyChunk(from, CD5, 4, to, 5, 0);
+				UtilFunctions.copyChunk(from, CD1, 0, to, 1, 0);
+				UtilFunctions.copyChunk(from, CD2, 1, to, 2, 0);
+				UtilFunctions.copyChunk(from, CD3, 2, to, 3, 0);
+				UtilFunctions.copyChunk(from, CD4, 3, to, 4, 0);
+				UtilFunctions.copyChunk(from, CD5, 4, to, 5, 0);
 				
 				
 				// Reset the daily challenge data for everyone:
@@ -64,7 +64,7 @@ public class DailyChallenges {
 					pp.setLives(3);
 					
 				}
-				Bukkit.broadcastMessage("§a§lA new daily challenge has arrived! To start it, click the clock item in the parkour selector!");
+				Bukkit.broadcastMessage("Â§aÂ§lA new daily challenge has arrived! To start it, click the clock item in the parkour selector!");
 				
 			}
 		}
@@ -87,7 +87,7 @@ public class DailyChallenges {
 		int ii = 0;
 		for (Entry<String,Long> ent : sorted.entrySet()) {
 			ii++;
-			result = result + "§2" + (ii) + ") §e" + ent.getKey() + "§2 - " + Main.readableTimeUnits(ent.getValue()) + "\n";
+			result = result + "Â§2" + (ii) + ") Â§e" + ent.getKey() + "Â§2 - " + Main.readableTimeUnits(ent.getValue()) + "\n";
 			if (ii == 10) break;
 		}
 		return result;

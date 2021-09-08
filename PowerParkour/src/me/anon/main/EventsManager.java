@@ -2,9 +2,13 @@ package me.anon.main;
 
 
 import me.anon.util.ParkourPlayer;
+import me.anon.util.ShopCosmetic;
+import net.minecraft.server.v1_8_R3.ItemStack;
+import net.minecraft.server.v1_8_R3.NBTTagCompound;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -20,43 +24,48 @@ import java.util.Objects;
 
 public class EventsManager implements Listener {
 
+
 	@EventHandler
 	public void onJoin(PlayerJoinEvent e) {
 		if (Main.PLAYERS.containsKey(e.getPlayer().getUniqueId())) {
-			e.getPlayer().sendMessage("§b>");
-			e.getPlayer().sendMessage("§6§lWelcome back!");
-			e.getPlayer().sendMessage("§rWelcome back to ParkourPower. Hopefully you have a good time :D");
-			e.getPlayer().sendMessage("§b>");
+			e.getPlayer().sendMessage("Â§b>");
+			e.getPlayer().sendMessage("Â§6Â§lWelcome back!");
+			e.getPlayer().sendMessage("Â§rWelcome back to ParkourPower. Hopefully you have a good time :D");
+			e.getPlayer().sendMessage("Â§b>");
 			ParkourPlayer p = Main.PLAYERS.get(e.getPlayer().getUniqueId());
 			if (!Objects.equals(p.getLastKnownName(), e.getPlayer().getName())) p.setLastKnownName(e.getPlayer().getName());
 			if (p.getDailyTime() == 0) {
-				e.getPlayer().sendMessage("§aYou haven't completed today's daily challenge yet! To play the daily challenge, click the clock in the parkour menu!");
+				e.getPlayer().sendMessage("Â§aYou haven't completed today's daily challenge yet! To play the daily challenge, click the clock in the parkour menu!");
 			}
-			if (p.hasPlus()) e.getPlayer().setPlayerListName("§f[§6§lP§f] " + e.getPlayer().getName());
-			if (p.hasPlus()) e.setJoinMessage("§6§l" + e.getPlayer().getName() + " §7has joined the game!"); else e.setJoinMessage(null);
+			if (p.hasPlus()) e.getPlayer().setPlayerListName("Â§f[Â§6Â§lPÂ§f] " + e.getPlayer().getName());
+			if (p.hasPlus()) e.setJoinMessage("Â§6Â§l" + e.getPlayer().getName() + " Â§7has joined the game!"); else e.setJoinMessage(null);
 
 		} else {
-			e.getPlayer().sendMessage("§b>");
-			e.getPlayer().sendMessage("§6§lWelcome to ParkourPower!");
-			e.getPlayer().sendMessage("§rParkourPower is a new minecraft server made specifically for parkour. \nIf you want to jump straight in, then go click the §c§lCaptain §rin front of you.\n\n§b> §rIf you want to learn about our rules, do §e/rules§r. If you want to learn about the server, do §e/info§r.");
-			e.getPlayer().sendMessage("§b>");
+			e.getPlayer().sendMessage("Â§b>");
+			e.getPlayer().sendMessage("Â§6Â§lWelcome to ParkourPower!");
+			e.getPlayer().sendMessage("Â§rParkourPower is a new minecraft server made specifically for parkour. \nIf you want to jump straight in, then go click the Â§cÂ§lCaptain Â§rin front of you.\n\nÂ§b> Â§rIf you want to learn about our rules, do Â§e/rulesÂ§r. If you want to learn about the server, do Â§e/infoÂ§r.");
+			e.getPlayer().sendMessage("Â§b>");
 			new ParkourPlayer(e.getPlayer().getUniqueId(),Main.getEmptyCompMap(),false,3,0,0,e.getPlayer().getName());
 		}
 	}
 	@EventHandler
 	public void onInventoryClick(InventoryClickEvent e) {
-		if (e.getInventory().getName().equals("§aParkour Selector")) {
-			e.setCancelled(true);
+		e.setCancelled(true);
+		System.out.println("inventory click");
+		if (e.getInventory().getName().equals("Â§aParkour Selector")) {
+			if (e.getCurrentItem() == null) return;
 			if (!e.getCurrentItem().hasItemMeta()) return;
 			if (e.getCurrentItem().getItemMeta().hasLore()) {
-				int levelid = Integer.parseInt(e.getCurrentItem().getItemMeta().getLore().get(e.getCurrentItem().getItemMeta().getLore().size()-1).substring(2));
+				ItemStack modifiableBase = CraftItemStack.asNMSCopy(e.getCurrentItem());
+				NBTTagCompound modifiableCompound = (modifiableBase.hasTag()) ? modifiableBase.getTag() : new NBTTagCompound();
+				int levelid = Integer.parseInt(modifiableCompound.getString("customid"));
 				Player p = (Player) e.getWhoClicked();
 				ParkourPlayer pp = Main.PLAYERS.get(p.getUniqueId());
 				//((Player) e.getWhoClicked()).sendMessage(levelid + " - " + Main.LEVELS.get(levelid).getName());
 				if (levelid < 0) {
 					if (levelid == -1) {
 						// return to lobby
-						p.sendMessage("§aYou have been returned to the lobby.");
+						p.sendMessage("Â§aYou have been returned to the lobby.");
 						pp.sendPlayerToLocation(-1);
 						return;
 					}
@@ -67,6 +76,7 @@ public class EventsManager implements Listener {
 					}
 					if (levelid == -3) {
 						pp.sendPlayerToLocation(-3);
+						e.getWhoClicked().closeInventory();
 						return;
 						
 					}
@@ -74,10 +84,60 @@ public class EventsManager implements Listener {
 				}
 				if (pp.canPlayLevel(levelid) == 0) {
 				pp.sendPlayerToLocation(levelid);
-				p.sendMessage("§aYou have started " + Main.LEVELS.get(levelid).getName() + "! Good luck :)");
-				} else p.sendMessage("§cYou can't play this level!");
+				p.sendMessage("Â§aYou have started " + Main.LEVELS.get(levelid).getName() + "! Good luck :)");
+				} else p.sendMessage("Â§cYou can't play this level!");
+			}
+		} else if (e.getInventory().getName().equals("Â§eStore")) {
+			if (e.getCurrentItem() == null) return;
+			if (!e.getCurrentItem().hasItemMeta()) return;
+			if (e.getCurrentItem().getItemMeta().hasLore()) {
+				ItemStack modifiableBase = CraftItemStack.asNMSCopy(e.getCurrentItem());
+				NBTTagCompound modifiableCompound = (modifiableBase.hasTag()) ? modifiableBase.getTag() : new NBTTagCompound();
+				String actionid = modifiableCompound.getString("customid");
+				ShopCosmetic cosmeticToBuy;
+				try {
+					cosmeticToBuy = ShopCosmetic.valueOf(actionid);
+				} catch(Error err) {
+					if (actionid.equals("no_action")) {
+						return;
+					} else {
+						System.out.println("Invalid action: " + actionid);
+						e.getWhoClicked().closeInventory();
+						return;
+					}
+				}
+
+				ParkourPlayer pp = Main.PLAYERS.get(e.getWhoClicked().getUniqueId());
+				if (pp.getOwnedCosmetics().contains(cosmeticToBuy)) {
+					// Selecting
+					if (e.getCurrentItem().getItemMeta().hasEnchants()) {
+						e.getWhoClicked().sendMessage("Â§cThis item is already selected.");
+						e.getWhoClicked().closeInventory();
+						return;
+					}
+					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "selectorinternal " + e.getWhoClicked().getName() + " " + cosmeticToBuy.toString() + " " + cosmeticToBuy.toString().split("_")[0]);
+				} else {
+					// Buying
+
+					if (e.getCurrentItem().getItemMeta().getLore().get(e.getCurrentItem().getItemMeta().getLore().size() - 1).startsWith("Â§cThis item")) {
+						e.getWhoClicked().sendMessage("Â§cYou can't buy this item right now!");
+						e.getWhoClicked().closeInventory();
+						return;
+					}
+
+					try {
+						int price = Integer.parseInt(e.getCurrentItem().getItemMeta().getLore().get(e.getCurrentItem().getItemMeta().getLore().size() - 1).split(" ")[5].substring(2));
+						Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "storeinternal " + e.getWhoClicked().getName() + " " + cosmeticToBuy.toString() + " " + price);
+
+					} catch(NumberFormatException error){
+						e.getWhoClicked().sendMessage("Â§cUnable to determine the price of this product. Report this as a bug.");
+					}
+
+				}
+
 			}
 		}
+		e.getWhoClicked().closeInventory();
 	}
 	@EventHandler
 	public void FoodChangeEvent(FoodLevelChangeEvent e) {
@@ -97,10 +157,7 @@ public class EventsManager implements Listener {
 		e.setCancelled(true);
 	}
 
-	@EventHandler
-	public void PlayerInventoryMoveEvent(InventoryEvent e) {
-		System.out.println("Inventory Event! More specifically: " + e.getEventName() + ". Inventory Name: " + e.getInventory().getName() + ". Inventory 'title': " + e.getInventory().getTitle() + ". Inventory owner: " + e.getInventory().getViewers().get(0).getName() + ".");
-	}
+
 
 	@EventHandler
 	public void PlayerInteractEvent(PlayerInteractEvent e) {
@@ -110,7 +167,7 @@ public class EventsManager implements Listener {
 			// Return to lobby
 			if (e.getItem().getType() == Material.IRON_DOOR_BLOCK) {
 				player.sendPlayerToLocation(-1);
-				e.getPlayer().sendMessage("§aReturning you to lobby.");
+				e.getPlayer().sendMessage("Â§aReturning you to lobby.");
 			}
 			// More options
 			if (e.getItem().getType() == Material.NETHER_STAR) {
@@ -121,7 +178,7 @@ public class EventsManager implements Listener {
 				- Enter practice mode
 				- cosmetic selections?
 				*/
-				e.getPlayer().sendMessage("§eHere is the part where the more options inventory will open.");
+				e.getPlayer().sendMessage("Â§eHere is the part where the more options inventory will open.");
 			}
 		}
 	}
@@ -130,10 +187,10 @@ public class EventsManager implements Listener {
 		e.setCancelled(true);
 		String tag = "";
 		ParkourPlayer p = Main.PLAYERS.get(e.getPlayer().getUniqueId());
-		if (p.hasPlus()) tag = "§f[§6§lP§f] ";
-		if (e.getPlayer().isOp()) tag = "§f[§4§lSTAFF§f] ";
+		if (p.hasPlus()) tag = "Â§f[Â§6Â§lPÂ§f] ";
+		if (e.getPlayer().isOp()) tag = "Â§f[Â§4Â§lSTAFFÂ§f] ";
 		String msg = e.getMessage();
-		if (!p.hasPlus()) msg = "§7" + msg;
+		if (!p.hasPlus()) msg = "Â§7" + msg;
 		String name = e.getPlayer().getName();
 		Bukkit.broadcastMessage(tag + name + ": " + msg);
 	}
@@ -150,10 +207,10 @@ public class EventsManager implements Listener {
 				if (pp.getLives() == 0) {
 					pp.sendPlayerToLocation(-1);
 					
-					e.getPlayer().sendMessage("§bYou ran out of lives!"
-							+ "\n§fYou've run out of lives. The daily challenge has a limited number of lives. If you want to try the challenge as many times as you want, you can always §b§lVOTE§f for our server. It's completely free and helps our server a lot!");
+					e.getPlayer().sendMessage("Â§bYou ran out of lives!"
+							+ "\nÂ§fYou've run out of lives. The daily challenge has a limited number of lives. If you want to try the challenge as many times as you want, you can always Â§bÂ§lVOTEÂ§f for our server. It's completely free and helps our server a lot!");
 				} else {
-					if (pp.getLives() > 100) e.getPlayer().sendMessage("§cYou died! §fSince you've voted, you didn't lose any lives.."); else e.getPlayer().sendMessage("§cYou died! §fYou lost a life. You now have §4" + pp.getLives() + "§f lives remaining.");
+					if (pp.getLives() > 100) e.getPlayer().sendMessage("Â§cYou died! Â§fSince you've voted, you didn't lose any lives.."); else e.getPlayer().sendMessage("Â§cYou died! Â§fYou lost a life. You now have Â§4" + pp.getLives() + "Â§f lives remaining.");
 					
 					Main.times.remove(e.getPlayer().getUniqueId());
 					Main.times.put(e.getPlayer().getUniqueId(),System.currentTimeMillis());
@@ -176,11 +233,11 @@ public class EventsManager implements Listener {
 			Main.times.put(e.getPlayer().getUniqueId(),System.currentTimeMillis());
 			pp.setFails(pp.getFails() + 1);
 			if (pp.getFails() % 20 == 0) {
-				e.getPlayer().sendMessage("§a> §3§lHaving trouble?" +
-						"\n§a> §6§lPLUS §rusers are able to use §bPractice Mode §rwhich" +
-						"\n§a> §rallows them to respawn right on the jump they fell." +
-						"\n§a> §bPractice Mode §rcompletions do not count as completions though." +
-						"\n§a> §rTo learn more about §6§lPLUS§r do §b/plus§r.");
+				e.getPlayer().sendMessage("Â§a> Â§3Â§lHaving trouble?" +
+						"\nÂ§a> Â§6Â§lPLUS Â§rusers are able to use Â§bPractice Mode Â§rwhich" +
+						"\nÂ§a> Â§rallows them to respawn right on the jump they fell." +
+						"\nÂ§a> Â§bPractice Mode Â§rcompletions do not count as completions though." +
+						"\nÂ§a> Â§rTo learn more about Â§6Â§lPLUSÂ§r do Â§b/plusÂ§r.");
 			}
 			return;
 			}
@@ -192,7 +249,7 @@ public class EventsManager implements Listener {
 				ParkourPlayer pp = Main.PLAYERS.get(e.getPlayer().getUniqueId());
 				if (pp.isPracMode()) {
 					pp.setLastGround(new Location(e.getPlayer().getWorld(),e.getFrom().getX(),e.getFrom().getY(),e.getFrom().getZ()));
-					e.getPlayer().sendMessage("§aPractice Mode checkpoint!");
+					e.getPlayer().sendMessage("Â§aPractice Mode checkpoint!");
 				}
 			}
 		}

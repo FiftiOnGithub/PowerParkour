@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="PowerParkour">
+    <output-path>$PROJECT_DIR$/classes/artifacts/PowerParkour</output-path>
+    <root id="archive" name="PowerParkour.jar">
+      <element id="module-output" name="PowerParkour" />
+      <element id="file-copy" path="$PROJECT_DIR$/config.yml" />
+      <element id="file-copy" path="$PROJECT_DIR$/players.yml" />
+      <element id="file-copy" path="$PROJECT_DIR$/plugin.yml" />
+    </root>
+  </artifact>
+</component>

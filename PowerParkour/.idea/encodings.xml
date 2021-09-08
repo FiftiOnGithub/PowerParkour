@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding" native2AsciiForPropertiesFiles="true" defaultCharsetForPropertiesFiles="UTF-8">
+    <file url="file://$PROJECT_DIR$/src/me/anon/dataManager/PlayerDataLoader.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/me/anon/dataManager/PlayerDataManager.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/me/anon/main/ChunkManager.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/me/anon/main/DailyChallenges.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/me/anon/main/EventsManager.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/me/anon/main/Main.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/me/anon/main/ParkourGUI.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/me/anon/main/UtilFunctions.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/me/anon/util/ParkourLevel.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/me/anon/util/ParkourPlayer.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/me/anon/util/ShopCosmetic.java" charset="UTF-8" />
+    <file url="PROJECT" charset="UTF-8" />
+  </component>
+</project>

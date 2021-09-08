@@ -22,7 +22,7 @@ public class ParkourGUI {
 				Material mat = Material.COMMAND;
 				if (p.getFeats().get(ii).size() > 0) {
 					if (p.hasGold(ii)) {
-						displayName = "§6§l✰ " + i.getName()+ " ✰";
+						displayName = "§6§l✭ " + i.getName()+ " ✭";
 						mat = Material.GOLD_BLOCK;
 					} else {
 						displayName = "§a§l" + i.getName();
@@ -70,57 +70,28 @@ public class ParkourGUI {
 						}
 					}
 				}
-			 	ItemStack item = new ItemStack(mat);
-				ItemMeta etm = item.getItemMeta();
-				etm.setDisplayName(displayName);
-				lore.add("§a");
-				lore.add("§7"+ii);	
-				etm.setLore(lore);
-				item.setItemMeta(etm);
+			 	// Entry is ii
+				ItemStack item = UtilFunctions.itemFactory(String.valueOf(ii),displayName,mat,lore,false);
 				base.setItem(i.getChestPos(), item);
 			}
 			ii++;
 		}
-		// LobbyItem
-		{
-			ItemStack lobbyItem = new ItemStack(Material.FEATHER);
-			ItemMeta lm = lobbyItem.getItemMeta();
-			lm.setDisplayName("§c§lReturn to Hub");
-			ArrayList<String> lore = new ArrayList<>();
-			lore.add("§7Returns you to the PowerParkour Hub.");
-			lore.add("§a");
-			lore.add("§7" + -1);
-			lm.setLore(lore);
-			lobbyItem.setItemMeta(lm);
-			base.setItem(40, lobbyItem);
-		}
-		
-		// PlusItem
-		{
-			ItemStack PlusItem = new ItemStack(Material.GOLD_INGOT);
-			ItemMeta pm = PlusItem.getItemMeta();
-			pm.setDisplayName("§a§lLearn about §6§lPLUS");
-			ArrayList<String> plore = new ArrayList<>();
-			plore.add("§7Our server offers the ability for you to purchase §6§lPLUS");
-			plore.add("§7membership using real life money. Some of the features are:");
-			plore.add("§7- Access to §bPractice Mode");
-			plore.add("§7- Increased daily challenge lives");
-			plore.add("§7- Special §f[§6§lP§r§f]§7 tag in chat and tab");
-			plore.add("§7... And much more! §aClick here to learn more!");
-			plore.add("§a");
-			plore.add("§7" + -2);
-			pm.setLore(plore);
-			PlusItem.setItemMeta(pm);
-			base.setItem(49, PlusItem);
-		}
-		
-		
-		
-		ItemStack DCItem = new ItemStack(Material.WATCH);
-		ItemMeta dcm = DCItem.getItemMeta();
-		dcm.setDisplayName("§b§lDaily Challenge");
+
+		ArrayList<String> lore = new ArrayList<>();
+		lore.add("§7Returns you to the PowerParkour Hub.");
+		base.setItem(40,UtilFunctions.itemFactory("-1","§c§lReturn to Hub",Material.FEATHER,lore,false));
+
+		ArrayList<String> plore = new ArrayList<>();
+		plore.add("§7Our server offers the ability for you to purchase §6§lPLUS");
+		plore.add("§7membership using real life money. Some of the features are:");
+		plore.add("§7- Access to §bPractice Mode");
+		plore.add("§7- Increased daily challenge lives");
+		plore.add("§7- Special §f[§6§lP§r§f]§7 tag in chat and tab");
+		plore.add("§7... And much more! §aClick here to learn more!");
+		base.setItem(49,UtilFunctions.itemFactory("-2","§a§lLearn about §6§lPLUS",Material.GOLD_INGOT,plore,false));
+
 		ArrayList<String> dlore = new ArrayList<>();
-		
+
 		dlore.add("§7The daily challenge is a parkour level that");
 		double htnc = Math.floor(DailyChallenges.timeTillNextChallenge() / 3600000f);
 		String tts = "§a" + htnc + "h";
@@ -135,16 +106,10 @@ public class ParkourGUI {
 				dlore.add("§cYou haven't completed today's daily challenge yet.");
 				dlore.add("§cYou'll lose your streak if you don't play the level!");
 			}
-			
+
 		}
 		if (p.getDailyTime() != 0) dlore.add("§7Your best time today: §2" + Main.readableTimeUnits(p.getDailyTime()));
-		dlore.add("§a");
-		dlore.add("§7"+-3);
-
-		dcm.setLore(dlore);
-		DCItem.setItemMeta(dcm);
-		base.setItem(4, DCItem);
-		
+		base.setItem(4,UtilFunctions.itemFactory("-3","§b§lDaily Challenge",Material.WATCH,dlore,false));
 		return base;
 	}
 	

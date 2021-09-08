@@ -4,13 +4,12 @@ import me.anon.util.ParkourPlayer;
 import me.anon.util.ShopCosmetic;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
+
+import static me.anon.main.UtilFunctions.itemFactory;
 
 public class ShopGUI {
 
@@ -53,13 +52,14 @@ public class ShopGUI {
             lore.clear();
             lore.add("§7A prefix to bring on the christmas cheer!");
             lore.add("§7Only buyable during §cDecember§7.");
-            inventory.setItem(12, setBasedOnOwnership(p, "PF", ShopCosmetic.PF_CHRISTMAS_TREE, -1, "[§2\uD83C\uDF32§f] Tag", Material.SNOW_BALL, lore));
+            // The name was determined before i found out that the christmas tree emote doesnt work in mc.
+            inventory.setItem(12, setBasedOnOwnership(p, "PF", ShopCosmetic.PF_CHRISTMAS_TREE, -1, "[§2❄§f] Tag", Material.SNOW_BALL, lore));
             lore.clear();
             lore.add("§7Shine like a (small) star!");
-            inventory.setItem(13, setBasedOnOwnership(p, "PF", ShopCosmetic.PF_SMALLSTAR, 200, "[§d✭§f] Tag", Material.GLOWSTONE_DUST, lore));
+            inventory.setItem(13, setBasedOnOwnership(p, "PF", ShopCosmetic.PF_SMALLSTAR, 200, "[§d✩§f] Tag", Material.GLOWSTONE_DUST, lore));
             lore.clear();
             lore.add("§7A big star for a great player!");
-            inventory.setItem(14, setBasedOnOwnership(p, "PF", ShopCosmetic.PF_BIGSTAR, 800, "[§5✹§f] Tag", Material.GLOWSTONE_DUST, lore));
+            inventory.setItem(14, setBasedOnOwnership(p, "PF", ShopCosmetic.PF_BIGSTAR, 800, "[§5✯§f] Tag", Material.GLOWSTONE_DUST, lore));
             lore.clear();
             lore.add("§7Show your dedication to the server!");
             inventory.setItem(15, setBasedOnOwnership(p, "PF", ShopCosmetic.PF_PRO, 1500, "[§cPRO§f] Tag", Material.REDSTONE, lore));
@@ -75,7 +75,7 @@ public class ShopGUI {
             lore.add("§7Tell other players when you join and leave!");
             inventory.setItem(28, setBasedOnOwnership(p, "JM", ShopCosmetic.JM_BASIC, 250, "§7Basic join & leave messages (Gray)", Material.DEAD_BUSH, lore));
             lore.clear();
-            lore.add("§7Send a " + Main.rainbow("colourful") + " to everyone when you join or leave!");
+            lore.add("§7Send a " + Main.rainbow("colourful") + "§7message to everyone when you join or leave!");
             inventory.setItem(29, setBasedOnOwnership(p, "JM", ShopCosmetic.JM_RAINBOW, 10000, Main.rainbow("Rainbow Join & Leave messages"), Material.PAINTING, lore));
             lore.clear();
             lore.add("§7No join & leave messages");
@@ -106,13 +106,13 @@ public class ShopGUI {
             // Daily Challenge extra life
             lore.clear();
             lore.add("§7Get one extra life in daily challenge!");
-            inventory.setItem(51, setBasedOnOwnership(p, "JM", ShopCosmetic.DC_EXTRA_ONE, 600, "§bExtra Daily Challenge Life", Material.SEA_LANTERN, lore));
+            inventory.setItem(51, setBasedOnOwnership(p, "DC", ShopCosmetic.DC_EXTRA_ONE, 600, "§bExtra Daily Challenge Life", Material.SEA_LANTERN, lore));
 
         }
 
-        inventory.setItem(49,itemFactory("§7Your coins: §6" + p.getCoinBalance() + "§7.", Material.GOLD_INGOT, null, false));
+        inventory.setItem(49,itemFactory("no_action","§7Your coins: §6" + p.getCoinBalance() + "§7.", Material.GOLD_INGOT, null, false));
 
-        return null;
+        return inventory;
     }
     // Here the price information is added based on whether the player owns the item. the lore should not include it.
     public static ItemStack setBasedOnOwnership(ParkourPlayer p, String category, ShopCosmetic requirement, int price, String displayName,Material material, ArrayList<String> lore) {
@@ -120,21 +120,21 @@ public class ShopGUI {
             if (p.getSelectedItems().get(category) != null && p.getSelectedItems().get(category).equals(requirement)) {
                 lore.add("§a");
                 lore.add("§eSelected!");
-                return itemFactory(displayName,material,lore,true);
+                return itemFactory(requirement.toString(),displayName,material,lore,true);
             } else {
                 lore.add("§a");
                 lore.add("§aClick to select!");
-                return itemFactory(displayName,material,lore,false);
+                return itemFactory(requirement.toString(),displayName,material,lore,false);
             }
         } else {
             if (price > 0) {
                 lore.add("§a");
-                lore.add("§aClick here to buy for §6" + price + "§a coins");
-                return itemFactory(displayName,material,lore,false);
+                lore.add("§aClick here to buy for §6" + price + " §acoins");
+                return itemFactory(requirement.toString(),displayName,material,lore,false);
             } else if (price != 0) {
                 lore.add("§a");
                 lore.add("§cThis item can't be bought!");
-                return itemFactory(displayName,material,lore,false);
+                return itemFactory(requirement.toString(),displayName,material,lore,false);
             } else {
                 /*
                 This cosmetic costs 0 coins, so it is automatically bought for you.
@@ -144,25 +144,10 @@ public class ShopGUI {
                 p.setOwnedCosmetics(cosmetics);
                 lore.add("§a");
                 lore.add("§aClick to select!");
-                return itemFactory(displayName,material,lore,false);
+                return itemFactory(requirement.toString(),displayName,material,lore,false);
             }
         }
     }
 
-    public static ItemStack itemFactory(String displayName, Material material, ArrayList<String> lore, boolean enchanted) {
-
-        ItemStack stack = new ItemStack(material);
-        ItemMeta meta = stack.getItemMeta();
-        meta.setDisplayName(displayName);
-        if (lore != null) {
-            meta.setLore(lore);
-        }
-        if (enchanted) {
-            meta.addEnchant(Enchantment.DURABILITY, 1, true);
-            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-        }
-        stack.setItemMeta(meta);
-        return stack;
-    }
 
 }

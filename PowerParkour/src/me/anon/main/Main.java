@@ -68,12 +68,12 @@ public class Main extends JavaPlugin {
 		Bukkit.getScheduler().scheduleSyncRepeatingTask(this, () -> {
 		   for (Entry<UUID,Long> i : times.entrySet()) {
 			   if (Bukkit.getPlayer(i.getKey()) != null) {
-				   ActionBarManager.ActionBar(ChatColor.GOLD + "Time: " + ChatColor.WHITE + readableTimeUnits(System.currentTimeMillis() - i.getValue()), Bukkit.getPlayer(i.getKey()));
+				   UtilFunctions.ActionBar(ChatColor.GOLD + "Time: " + ChatColor.WHITE + readableTimeUnits(System.currentTimeMillis() - i.getValue()), Bukkit.getPlayer(i.getKey()));
 			   }
 		   }
 
-		   if (ChunkManager.blockchanges.size() > 0) {
-			   ChunkManager.performUpdates(20);
+		   if (UtilFunctions.blockchanges.size() > 0) {
+			   UtilFunctions.performUpdates(20);
 		   }
 		   DailyChallenges.runUpdate(false);
 
@@ -89,7 +89,7 @@ public class Main extends JavaPlugin {
 		ArrayList<String> messageSplit = new ArrayList<String>(Arrays.asList(message.split("")));
 		String newmessage = "";
 		for (String i : messageSplit) {
-			newmessage+=("§"+rainbow[pos]+i);
+			newmessage+=("Â§"+rainbow[pos]+i);
 			pos++;
 			if (rainbow.length == pos) pos = 0;
 		}
@@ -100,13 +100,13 @@ public class Main extends JavaPlugin {
 		// Creating player in game inventory content
 		ItemStack nether_star = new ItemStack(Material.NETHER_STAR);
 		ItemMeta nether_star_item_meta = nether_star.getItemMeta();
-		nether_star_item_meta.setDisplayName("§e§lMore Options §7(Right Click)");
+		nether_star_item_meta.setDisplayName("Â§eÂ§lMore Options Â§7(Right Click)");
 		nether_star.setItemMeta(nether_star_item_meta);
 		p.getInventory().setItem(45,nether_star);
 
 		ItemStack iron_door = new ItemStack(Material.IRON_DOOR);
 		ItemMeta iron_door_item_meta = iron_door.getItemMeta();
-		iron_door_item_meta.setDisplayName("§cReturn to Lobby §7(Right Click)");
+		iron_door_item_meta.setDisplayName("Â§cReturn to Lobby Â§7(Right Click)");
 		iron_door.setItemMeta(iron_door_item_meta);
 		p.getInventory().setItem(44,iron_door);
 	}
@@ -122,13 +122,13 @@ public class Main extends JavaPlugin {
 	}
 	
 	public static void advertisePlus(Player p) {
-		p.sendMessage("Interested in §6§lPLUS§f?"
-				+"\n§fPLUS is a §blifetime §fpurchase, which you make once and benefit from for as long as you play on our network. The price of PLUS is §b5.00$§f. For that price, you get:"
-				+"\n- §bPractice Mode"
-				+"\n§f- Special §f[§6§lP§r§f] tag in chat and the tab list"
-				+"\n§f- Join announcements"
-				+"\n§f- Extra daily challenge lives"
-				+"\n§f- 3 more full parkour levels");
+		p.sendMessage("Interested in Â§6Â§lPLUSÂ§f?"
+				+"\nÂ§fPLUS is a Â§blifetime Â§fpurchase, which you make once and benefit from for as long as you play on our network. The price of PLUS is Â§b5.00$Â§f. For that price, you get:"
+				+"\n- Â§bPractice Mode"
+				+"\nÂ§f- Special Â§f[Â§6Â§lPÂ§rÂ§f] tag in chat and the tab List"
+				+"\nÂ§f- Join announcements"
+				+"\nÂ§f- Extra daily challenge lives"
+				+"\nÂ§f- 3 more full parkour levels");
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -165,16 +165,16 @@ public class Main extends JavaPlugin {
 		if (cmd.getName().equalsIgnoreCase("practice")) {
 			ParkourPlayer pp = Main.PLAYERS.get(((Player)sender).getUniqueId());
 			if (!pp.hasPlus()) {
-				sender.sendMessage("§cThis feature requires §6§lPLUS§c. To learn more, do §b/plus§c.");
+				sender.sendMessage("Â§cThis feature requires Â§6Â§lPLUSÂ§c. To learn more, do Â§b/plusÂ§c.");
 				return true;
 			}
 			if (Main.times.get(pp.getUUID()) == null || pp.getLocation() == -3) {
-				sender.sendMessage("§cYou must be in a parkour level to use this feature!");
+				sender.sendMessage("Â§cYou must be in a parkour level to use this feature!");
 				return true;
 			}
 			pp.setPracMode(!pp.isPracMode());
-			if (pp.isPracMode()) sender.sendMessage("§aYou have entered §bPractice Mode!"); else {
-				sender.sendMessage("§aYou have exited §bPractice Mode §a. To prevent abuse, you're being teleported back to the start of the level.");
+			if (pp.isPracMode()) sender.sendMessage("Â§aYou have entered Â§bPractice Mode!"); else {
+				sender.sendMessage("Â§aYou have exited Â§bPractice Mode Â§a. To prevent abuse, you're being teleported back to the start of the level.");
 				((Player)sender).teleport(((Player)sender).getWorld().getSpawnLocation());
 			}
 		}
@@ -200,22 +200,22 @@ public class Main extends JavaPlugin {
 			if (args.length == 1) {
 				if (Bukkit.getOfflinePlayer(args[0]) != null) {
 					Main.PLAYERS.get(Bukkit.getOfflinePlayer(args[0]).getUniqueId()).setPlus(true);
-					sender.sendMessage("§aThis person now has PLUS.");
+					sender.sendMessage("Â§aThis person now has PLUS.");
 					
 					if (Bukkit.getPlayer(args[0]) != null) {
-						Bukkit.getPlayer(args[0]).sendMessage("§aYou have become a §6§lPLUS §amember! Congratulations!"
-								+"\n§fTo receive the full benefits of the package, please re-log onto the server."
-								+"\n§a§lThanks for your support!");
+						Bukkit.getPlayer(args[0]).sendMessage("Â§aYou have become a Â§6Â§lPLUS Â§amember! Congratulations!"
+								+"\nÂ§fTo receive the full benefits of the package, please re-log onto the server."
+								+"\nÂ§aÂ§lThanks for your support!");
 					}
 					
-				} else sender.sendMessage("§cPlayer not found.");
-			} else sender.sendMessage("§cUsage: /grantplus <ign>");
+				} else sender.sendMessage("Â§cPlayer not found.");
+			} else sender.sendMessage("Â§cUsage: /grantplus <ign>");
 			
 		}
 		if (cmd.getName().equalsIgnoreCase("dailytop")) {
-			String msg = "§2§lDaily Challenge fastest times: \n" + DailyChallenges.getTop();
+			String msg = "Â§2Â§lDaily Challenge fastest times: \n" + DailyChallenges.getTop();
 			int pos = DailyChallenges.getPos(((Player)sender).getUniqueId());
-			if (pos > 0) msg = msg + "§2Your position on today's leaderboard is: §e#" + pos;
+			if (pos > 0) msg = msg + "Â§2Your position on today's leaderboard is: Â§e#" + pos;
 			sender.sendMessage(msg);
 		}
 
@@ -230,7 +230,7 @@ public class Main extends JavaPlugin {
 			if (args.length == 3) {
 				Player buyer = Bukkit.getPlayer(args[0]);
 				if (buyer == null) {
-					sender.sendMessage("§cPlayer not found.");
+					sender.sendMessage("Â§cPlayer not found.");
 					return true;
 				}
 				ParkourPlayer buyer_wrapped = PLAYERS.get(buyer.getUniqueId());
@@ -238,7 +238,7 @@ public class Main extends JavaPlugin {
 				try {
 					ItemToBuy = ShopCosmetic.valueOf(args[1]);
 				} catch(Error e) {
-					buyer.sendMessage("§cItem not found. Please report this!");
+					buyer.sendMessage("Â§cItem not found. Please report this!");
 					sender.sendMessage("Tried to buy invalid item: " + args[1]);
 					return true;
 				}
@@ -247,7 +247,7 @@ public class Main extends JavaPlugin {
 					price = Integer.parseInt(args[2]);
 				}
 				catch (NumberFormatException ex){
-					buyer.sendMessage("§cCouldn't buy this item, price is set incorrectly. Report this as a bug!");
+					buyer.sendMessage("Â§cCouldn't buy this item, price is set incorrectly. Report this as a bug!");
 					sender.sendMessage("Couldn't sell item, invalid price.");
 					return true;
 				}
@@ -259,12 +259,12 @@ public class Main extends JavaPlugin {
 						itemsOwned.add(ItemToBuy);
 						System.out.println(buyer_wrapped.getOwnedCosmetics().toString());
 						buyer_wrapped.setOwnedCosmetics(itemsOwned);
-						buyer.sendMessage("§ePurchase successful!");
+						buyer.sendMessage("Â§ePurchase successful!");
 					} else {
-						buyer.sendMessage("§cYou already own this item!");
+						buyer.sendMessage("Â§cYou already own this item!");
 					}
 				} else {
-					buyer.sendMessage("§cYou can't afford to purchase this item!");
+					buyer.sendMessage("Â§cYou can't afford to purchase this item!");
 					return true;
 				}
 			}
@@ -294,7 +294,7 @@ public class Main extends JavaPlugin {
 				return true;
 			}
 			sender.sendMessage("starting");
-			ChunkManager.copyChunk(Bukkit.getWorld("DC_COPY"), 1, 1, Bukkit.getWorld("DC_WORLD"), 1, 1);
+			UtilFunctions.copyChunk(Bukkit.getWorld("DC_COPY"), 1, 1, Bukkit.getWorld("DC_WORLD"), 1, 1);
 			sender.sendMessage("done");
 		}
 		if (cmd.getName().equalsIgnoreCase("voteinternal")) {
@@ -304,10 +304,10 @@ public class Main extends JavaPlugin {
 			}
 			if (args.length == 1) {
 				if (Bukkit.getOfflinePlayer(args[0]) != null) {
-					if (Bukkit.getPlayer(args[0]).getUniqueId() != null) Bukkit.getPlayer(args[0]).sendMessage("§aThank you for your §b§lVOTE §afor the server. You now have infinite daily challenge lives!\n\nVoting for the server really helps us grow and become larger, so please keep doing it if you'd like to support us :)"); 
+					if (Bukkit.getPlayer(args[0]).getUniqueId() != null) Bukkit.getPlayer(args[0]).sendMessage("Â§aThank you for your Â§bÂ§lVOTE Â§afor the server. You now have infinite daily challenge lives!\n\nVoting for the server really helps us grow and become larger, so please keep doing it if you'd like to support us :)"); 
 					Main.PLAYERS.get(Bukkit.getOfflinePlayer(args[0]).getUniqueId()).setLives(9999);
-				} else sender.sendMessage("§cPlayer not found.");
-			} else sender.sendMessage("§cUsage: /voteinternal <username>");
+				} else sender.sendMessage("Â§cPlayer not found.");
+			} else sender.sendMessage("Â§cUsage: /voteinternal <username>");
 		}
 
 		if (cmd.getName().equalsIgnoreCase("selectorinternal")) {
@@ -320,7 +320,7 @@ public class Main extends JavaPlugin {
 
 				Player target = Bukkit.getPlayer(args[0]);
 				if (target == null) {
-					sender.sendMessage("§cPlayer not found.");
+					sender.sendMessage("Â§cPlayer not found.");
 					return true;
 				}
 				ParkourPlayer targetWrapped = PLAYERS.get(target.getUniqueId());
@@ -329,16 +329,16 @@ public class Main extends JavaPlugin {
 				try {
 					ItemToBuy = ShopCosmetic.valueOf(args[1]);
 				} catch(Error e) {
-					target.sendMessage("§cItem not found. Please report this!");
+					target.sendMessage("Â§cItem not found. Please report this!");
 					sender.sendMessage("Tried to buy invalid item: " + args[1]);
 					return true;
 				}
 
 				boolean result = setItemAsSelected(ItemToBuy,targetWrapped,args[2]);
 				if (result) {
-					target.sendMessage("§7Selected successfully!");
+					target.sendMessage("Â§7Selected successfully!");
 				} else {
-					target.sendMessage("§cUnable to select item! You don't own it!");
+					target.sendMessage("Â§cUnable to select item! You don't own it!");
 				}
 				return true;
 
@@ -347,7 +347,7 @@ public class Main extends JavaPlugin {
 
 		if (cmd.getName().equalsIgnoreCase("endparkour")) {
 			if (args.length != 1) {
-				sender.sendMessage("§cIncorrect arguments. /endparkour <player>");
+				sender.sendMessage("Â§cIncorrect arguments. /endparkour <player>");
 				return true;
 			}
 			Player player = Bukkit.getPlayer(args[0]);
@@ -363,13 +363,13 @@ public class Main extends JavaPlugin {
 				long time = System.currentTimeMillis() - times.get(player.getUniqueId());
 
 				if (pp.getLocation() == -3) {
-					player.sendMessage("§aYou've completed today's parkour challenge! §fYour time was §6" + readableTimeUnits(time) + "§f. To check your streak, hover over the clock in the menu.");
+					player.sendMessage("Â§aYou've completed today's parkour challenge! Â§fYour time was Â§6" + readableTimeUnits(time) + "Â§f. To check your streak, hover over the clock in the menu.");
 					if (pp.getDailyTime() > 0) {
 						if (pp.getDailyTime() > time) pp.setDailyTime(time);
 					} else {
 						pp.setDailyTime(time);
 						int coinsToAdd = 40 + (10 * pp.getDailyStreak());
-						player.sendMessage("§6You earned " + coinsToAdd + " coins (Daily Challenge)!");
+						player.sendMessage("Â§6You earned " + coinsToAdd + " coins (Daily Challenge)!");
 						pp.setCoinBalance(pp.getCoinBalance() + coinsToAdd);
 					}
 
@@ -396,13 +396,13 @@ public class Main extends JavaPlugin {
 
 
 
-				player.sendMessage("§a> §lParkour Challenge Complete!"
-						+ "\n§a> §rYour time was §a§l"+readableTimeUnits(time)+"§r. To earn "
-						+ "\n§a> §ra §6§lGold star§r, your time needs to be"
-						+ "\n§a> §rfaster than §7" + readableTimeUnits(LEVELS.get(pp.getLocation()).getGoldTime()) + "§r.");
+				player.sendMessage("Â§a> Â§lParkour Challenge Complete!"
+						+ "\nÂ§a> Â§rYour time was Â§aÂ§l"+readableTimeUnits(time)+"Â§r. To earn "
+						+ "\nÂ§a> Â§ra Â§6Â§lGold starÂ§r, your time needs to be"
+						+ "\nÂ§a> Â§rfaster than Â§7" + readableTimeUnits(LEVELS.get(pp.getLocation()).getGoldTime()) + "Â§r.");
 				pp.addFeat(time, pp.getLocation());
 				times.remove(player.getUniqueId());
-				player.sendMessage("§6You earned " + coinsToAdd + " coins (" + desc + ")!");
+				player.sendMessage("Â§6You earned " + coinsToAdd + " coins (" + desc + ")!");
 			} else player.sendMessage("You're not being timed!");
 			pp.sendPlayerToLocation(-1);
 		}
