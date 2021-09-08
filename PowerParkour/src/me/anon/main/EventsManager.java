@@ -176,12 +176,11 @@ public class EventsManager implements Listener {
 			Main.times.put(e.getPlayer().getUniqueId(),System.currentTimeMillis());
 			pp.setFails(pp.getFails() + 1);
 			if (pp.getFails() % 20 == 0) {
-				e.getPlayer().sendMessage("""
-						§a> §3§lHaving trouble?
-						§a> §6§lPLUS §rusers are able to use §bPractice Mode §rwhich
-						§a> §rallows them to respawn right on the jump they fell.
-						§a> §bPractice Mode §rcompletions do not count as completions though.
-						§a> §rTo learn more about §6§lPLUS§r do §b/plus§r.""");
+				e.getPlayer().sendMessage("§a> §3§lHaving trouble?" +
+						"\n§a> §6§lPLUS §rusers are able to use §bPractice Mode §rwhich" +
+						"\n§a> §rallows them to respawn right on the jump they fell." +
+						"\n§a> §bPractice Mode §rcompletions do not count as completions though." +
+						"\n§a> §rTo learn more about §6§lPLUS§r do §b/plus§r.");
 			}
 			return;
 			}

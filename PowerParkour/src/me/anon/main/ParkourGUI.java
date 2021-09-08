@@ -34,34 +34,39 @@ public class ParkourGUI {
 				} else {
 					int cpl = p.canPlayLevel(ii);
 					switch (cpl) {
-						case 0 -> {
+						case 0: {
 							mat = Material.EMERALD;
 							displayName = "§a§l" + i.getName();
 							lore.add("§aYou can play this level right now!");
 							lore.add("§aClick here to enter!");
+							break;
 						}
-						case 1 -> {
+						case 1: {
 							mat = Material.WOOD_BUTTON;
 							displayName = "§e§l" + i.getName();
 							lore.add("§cYou haven't yet completed");
 							lore.add("§cthe level before this!");
+							break;
 						}
-						case 2 -> {
+						case 2: {
 							mat = Material.STONE_PLATE;
 							displayName = "§6§l" + i.getName();
 							lore.add("§cTo play this level,");
 							lore.add("§cyou need to get a §6§lGold star");
 							lore.add("§cin every other level (except plus ones)");
+							break;
 						}
-						case 3 -> {
+						case 3: {
 							mat = Material.STONE_BUTTON;
 							displayName = "§b§l" + i.getName();
 							lore.add("§cThis level is for §6PLUS §crank only.");
 							lore.add("§cTo learn more about §6PLUS§c, do /plus");
+							break;
 						}
-						case 4 -> {
+						case 4: {
 							displayName = "§4§l" + i.getName();
 							lore.add("§4A bug has happened. Contact admins about this with the level name and your username.");
+							break;
 						}
 					}
 				}
