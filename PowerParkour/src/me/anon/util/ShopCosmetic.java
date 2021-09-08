@@ -1,4 +1,4 @@
-package me.anon.main;
+package me.anon.util;
 @SuppressWarnings("unused")
 /*
 CM - Completion Messages

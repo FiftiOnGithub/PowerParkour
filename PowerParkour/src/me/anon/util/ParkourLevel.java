@@ -1,4 +1,6 @@
-package me.anon.main;
+package me.anon.util;
+
+import me.anon.main.Main;
 
 public class ParkourLevel {
 	

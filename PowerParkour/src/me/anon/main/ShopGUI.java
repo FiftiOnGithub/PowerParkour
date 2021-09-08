@@ -1,5 +1,7 @@
 package me.anon.main;
 
+import me.anon.util.ParkourPlayer;
+import me.anon.util.ShopCosmetic;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -19,7 +21,7 @@ public class ShopGUI {
     MDT_ONE,
     DC_EXTRA_ONE
      */
-    public static Inventory getInventory(ParkourPlayer p,boolean op) {
+    public static Inventory getInventory(ParkourPlayer p, boolean op) {
         Inventory inventory = Bukkit.createInventory(null,54,"§eStore");
         ArrayList<String> lore = new ArrayList<String>();
 
