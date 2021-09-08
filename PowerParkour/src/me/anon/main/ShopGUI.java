@@ -117,7 +117,7 @@ public class ShopGUI {
     // Here the price information is added based on whether the player owns the item. the lore should not include it.
     public static ItemStack setBasedOnOwnership(ParkourPlayer p, String category, ShopCosmetic requirement, int price, String displayName,Material material, ArrayList<String> lore) {
         if (p.getOwnedCosmetics().contains(requirement)) {
-            if (p.getSelectedItems().get(category).equals(requirement)) {
+            if (p.getSelectedItems().get(category) != null && p.getSelectedItems().get(category).equals(requirement)) {
                 lore.add("§a");
                 lore.add("§eSelected!");
                 return itemFactory(displayName,material,lore,true);

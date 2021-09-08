@@ -187,7 +187,7 @@ public class Main extends JavaPlugin {
 				if (sender.isOp()) {
 					Player p = Bukkit.getPlayer(args[0]);
 					if (p != null) {
-						ShopGUI.getInventory(Main.PLAYERS.get(p.getUniqueId()),p.isOp());
+						p.openInventory(ShopGUI.getInventory(Main.PLAYERS.get(p.getUniqueId()),p.isOp()));
 					} else sender.sendMessage("Player not found.");
 				} else sender.sendMessage("This is an admin-only command.");
 			}

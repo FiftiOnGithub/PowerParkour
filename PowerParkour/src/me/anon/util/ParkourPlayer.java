@@ -62,7 +62,12 @@ public class ParkourPlayer {
 		pracMode = false;
 		this.setDailyStreak(dailyS);
 		this.setDailyTime(dailyT);
-		
+
+
+		// TODO: Fix this
+		this.owned_cosmetics = new ArrayList<ShopCosmetic>();
+		this.coinBalance = 0;
+		this.selected_items = new HashMap<String,ShopCosmetic>();
 		
 		Main.PLAYERS.put(uuid, this);
 	}
