@@ -28,7 +28,7 @@ public class Main extends JavaPlugin {
 	public static ArrayList<ParkourLevel> LEVELS = new ArrayList<ParkourLevel>();
 	public static HashMap<UUID, ParkourPlayer> PLAYERS = new HashMap<UUID,ParkourPlayer>();
 	public static HashMap<UUID,Long> times = new HashMap<UUID, Long>();
-	public static HashMap<String, ShopCosmetic[]> buyable_items;
+	public static HashMap<String, ShopCosmetic[]> buyable_items = new HashMap<String, ShopCosmetic[]>();
 	public static String readableTimeUnits(Long millis) {
 		long sec = Math.floorDiv(millis, 1000L);
 		long dispsec = sec % 60;
@@ -122,14 +122,13 @@ public class Main extends JavaPlugin {
 	}
 	
 	public static void advertisePlus(Player p) {
-		p.sendMessage("""
-				Interested in §6§lPLUS§f?
-				§fPLUS is a §blifetime §fpurchase, which you make once and benefit from for as long as you play on our network. The price of PLUS is §b5.00$§f. For that price, you get:
-				- §bPractice Mode
-				§f- Special §f[§6§lP§r§f] tag in chat and the tab list
-				§f- Join announcements
-				§f- Extra daily challenge lives
-				§f- 3 more full parkour levels""");
+		p.sendMessage("Interested in §6§lPLUS§f?"
+				+"\n§fPLUS is a §blifetime §fpurchase, which you make once and benefit from for as long as you play on our network. The price of PLUS is §b5.00$§f. For that price, you get:"
+				+"\n- §bPractice Mode"
+				+"\n§f- Special §f[§6§lP§r§f] tag in chat and the tab list"
+				+"\n§f- Join announcements"
+				+"\n§f- Extra daily challenge lives"
+				+"\n§f- 3 more full parkour levels");
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -204,11 +203,9 @@ public class Main extends JavaPlugin {
 					sender.sendMessage("§aThis person now has PLUS.");
 					
 					if (Bukkit.getPlayer(args[0]) != null) {
-						Bukkit.getPlayer(args[0]).sendMessage("""
-								§aYou have become a §6§lPLUS §amember! Congratulations!\s
-								§fTo receive the full benefits of the package, please re-log onto the server.
-
-								§a§lThanks for your support!""");
+						Bukkit.getPlayer(args[0]).sendMessage("§aYou have become a §6§lPLUS §amember! Congratulations!"
+								+"\n§fTo receive the full benefits of the package, please re-log onto the server."
+								+"\n§a§lThanks for your support!");
 					}
 					
 				} else sender.sendMessage("§cPlayer not found.");
