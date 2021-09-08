@@ -48,9 +48,12 @@ public class PlayerDataManager {
 	        }
 	        return fileConfiguration;
 	    }
-	 
+
+		// TODO: Load player data one-by-one with loadPlayer function and save new data (owned cosmetics, selections, balance). Requires player data get abstraction
+
 	    public void saveConfig() {
 	        if (fileConfiguration == null || configFile == null) {
+				System.out.println("Couldn't save to config! fileconfiguration or configfile was null! [PowerParkour]");
 	        } else {
 	            try {
 	                getConfig().save(configFile);

@@ -74,36 +74,38 @@ public class ParkourGUI {
 			}
 			ii++;
 		}
-		// Return to lobby
-		ItemStack lobbyItem = new ItemStack(Material.FEATHER);
-		ItemMeta lm = lobbyItem.getItemMeta();
-		lm.setDisplayName("§c§lReturn to Hub");
-		ArrayList<String> lore = new ArrayList<>();
-		lore.add("§7Returns you to the PowerParkour Hub.");
-		lore.add("§a");
-		lore.add("§7"+-1);
-		lm.setLore(lore);
-		lobbyItem.setItemMeta(lm);
-		base.setItem(40, lobbyItem);
+		// LobbyItem
+		{
+			ItemStack lobbyItem = new ItemStack(Material.FEATHER);
+			ItemMeta lm = lobbyItem.getItemMeta();
+			lm.setDisplayName("§c§lReturn to Hub");
+			ArrayList<String> lore = new ArrayList<>();
+			lore.add("§7Returns you to the PowerParkour Hub.");
+			lore.add("§a");
+			lore.add("§7" + -1);
+			lm.setLore(lore);
+			lobbyItem.setItemMeta(lm);
+			base.setItem(40, lobbyItem);
+		}
 		
-		
-		
-		ItemStack PlusItem = new ItemStack(Material.GOLD_INGOT);
-		ItemMeta pm = PlusItem.getItemMeta();
-		pm.setDisplayName("§a§lLearn about §6§lPLUS");
-		ArrayList<String> plore = new ArrayList<>();
-		plore.add("§7Our server offers the ability for you to purchase §6§lPLUS");
-		plore.add("§7membership using real life money. Some of the features are:");
-		plore.add("§7- Access to §bPractice Mode");
-		plore.add("§7- Increased daily challenge lives");
-		plore.add("§7- Special §f[§6§lP§r§f]§7 tag in chat and tab");
-		plore.add("§7... And much more! §aClick here to learn more!");
-		plore.add("§a");
-		plore.add("§7"+-2);
-		pm.setLore(plore);
-		PlusItem.setItemMeta(pm);
-		base.setItem(49, PlusItem);
-		
+		// PlusItem
+		{
+			ItemStack PlusItem = new ItemStack(Material.GOLD_INGOT);
+			ItemMeta pm = PlusItem.getItemMeta();
+			pm.setDisplayName("§a§lLearn about §6§lPLUS");
+			ArrayList<String> plore = new ArrayList<>();
+			plore.add("§7Our server offers the ability for you to purchase §6§lPLUS");
+			plore.add("§7membership using real life money. Some of the features are:");
+			plore.add("§7- Access to §bPractice Mode");
+			plore.add("§7- Increased daily challenge lives");
+			plore.add("§7- Special §f[§6§lP§r§f]§7 tag in chat and tab");
+			plore.add("§7... And much more! §aClick here to learn more!");
+			plore.add("§a");
+			plore.add("§7" + -2);
+			pm.setLore(plore);
+			PlusItem.setItemMeta(pm);
+			base.setItem(49, PlusItem);
+		}
 		
 		
 		
@@ -114,7 +116,7 @@ public class ParkourGUI {
 		
 		dlore.add("§7The daily challenge is a parkour level that");
 		double htnc = Math.floor(DailyChallenges.timeTillNextChallenge() / 3600000f);
-		String tts = "§a" + htnc + " hour(s)";
+		String tts = "§a" + htnc + "h";
 		if (htnc < 1.0D) tts =  "§aless than 1 hour";
 		dlore.add("§7changes every day. The next change will happen in " + tts + "§7.");
 		dlore.add("§7Try to get a high daily streak!");

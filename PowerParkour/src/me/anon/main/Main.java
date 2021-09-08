@@ -1,9 +1,7 @@
 package me.anon.main;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.UUID;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -23,10 +21,10 @@ public class Main extends JavaPlugin {
 	PlayerDataLoader pdl;
 	
 	public FileConfiguration config;
-	static public ArrayList<ParkourLevel> LEVELS = new ArrayList<ParkourLevel>();
+	public static ArrayList<ParkourLevel> LEVELS = new ArrayList<ParkourLevel>();
 	public static HashMap<UUID,ParkourPlayer> PLAYERS = new HashMap<UUID,ParkourPlayer>();
 	public static HashMap<UUID,Long> times = new HashMap<UUID, Long>();
-	
+	public static HashMap<String,ShopCosmetic[]> buyable_items;
 	public static String readableTimeUnits(Long millis) {
 		long sec = Math.floorDiv(millis, 1000L);
 		long dispsec = sec % 60;
@@ -50,6 +48,13 @@ public class Main extends JavaPlugin {
 	@Override 
 	public void onEnable() {
 
+		buyable_items.put("CM",new ShopCosmetic[]{ShopCosmetic.CM_BASIC, ShopCosmetic.CM_FLEX, ShopCosmetic.CM_NONE});
+
+		buyable_items.put("JM",new ShopCosmetic[]{ShopCosmetic.JM_BASIC, ShopCosmetic.JM_RAINBOW, ShopCosmetic.JM_NONE});
+
+		buyable_items.put("PF",new ShopCosmetic[]{ShopCosmetic.PF_BIGSTAR, ShopCosmetic.PF_CHRISTMAS_TREE, ShopCosmetic.PF_PLUS,
+									ShopCosmetic.PF_STAFF, ShopCosmetic.PF_SMALLSTAR, ShopCosmetic.PF_PRO, ShopCosmetic.PF_NONE});
+
 		PluginManager pm = Bukkit.getServer().getPluginManager();
 		pm.registerEvents(new EventsManager(), this);
 		config = getConfig();
@@ -72,6 +77,19 @@ public class Main extends JavaPlugin {
 
 
 		
+	}
+
+	public static String rainbow(String message) {
+		String[] rainbow = {"4","c","6","e","6","c"};
+		int pos = 0;
+		ArrayList<String> messageSplit = new ArrayList<String>(Arrays.asList(message.split("")));
+		String newmessage = "";
+		for (String i : messageSplit) {
+			newmessage+=("§"+rainbow[pos]+i);
+			pos++;
+			if (rainbow.length == pos) pos = 0;
+		}
+		return newmessage;
 	}
 
 	public static void setPlayerInventory(Player p) {
@@ -161,6 +179,16 @@ public class Main extends JavaPlugin {
 		if (cmd.getName().equalsIgnoreCase("plus")) {
 			advertisePlus((Player) sender);
 		}
+		if (cmd.getName().equalsIgnoreCase("openstoreinventory")) {
+			if (args.length == 1) {
+				if (sender.isOp()) {
+					Player p = Bukkit.getPlayer(args[0]);
+					if (p != null) {
+						ShopGUI.getInventory(Main.PLAYERS.get(p.getUniqueId()),p.isOp());
+					} else sender.sendMessage("Player not found.");
+				} else sender.sendMessage("This is an admin-only command.");
+			}
+		}
 		if (cmd.getName().equalsIgnoreCase("grantplus")) {
 			if (!sender.isOp()) {
 				sender.sendMessage("This is an admin-only command.");
@@ -189,6 +217,58 @@ public class Main extends JavaPlugin {
 			if (pos > 0) msg = msg + "§2Your position on today's leaderboard is: §e#" + pos;
 			sender.sendMessage(msg);
 		}
+
+		if (cmd.getName().equalsIgnoreCase("storeinternal")) {
+			if (!sender.isOp()) {
+				sender.sendMessage("this is an admin-only command.");
+				return true;
+			}
+			// Argument 1: Player making purchase
+			// Argument 2: Item being bought
+			// Argument 3: Price
+			if (args.length == 3) {
+				Player buyer = Bukkit.getPlayer(args[0]);
+				if (buyer == null) {
+					sender.sendMessage("§cPlayer not found.");
+					return true;
+				}
+				ParkourPlayer buyer_wrapped = PLAYERS.get(buyer.getUniqueId());
+				ShopCosmetic ItemToBuy;
+				try {
+					ItemToBuy = ShopCosmetic.valueOf(args[1]);
+				} catch(Error e) {
+					buyer.sendMessage("§cItem not found. Please report this!");
+					sender.sendMessage("Tried to buy invalid item: " + args[1]);
+					return true;
+				}
+				int price;
+				try{
+					price = Integer.parseInt(args[2]);
+				}
+				catch (NumberFormatException ex){
+					buyer.sendMessage("§cCouldn't buy this item, price is set incorrectly. Report this as a bug!");
+					sender.sendMessage("Couldn't sell item, invalid price.");
+					return true;
+				}
+
+				if (buyer_wrapped.getCoinBalance() >= price) {
+					ArrayList<ShopCosmetic> itemsOwned = buyer_wrapped.getOwnedCosmetics();
+					if (!itemsOwned.contains(ItemToBuy)) {
+						buyer_wrapped.setCoinBalance(buyer_wrapped.getCoinBalance() - price);
+						itemsOwned.add(ItemToBuy);
+						System.out.println(buyer_wrapped.getOwnedCosmetics().toString());
+						buyer_wrapped.setOwnedCosmetics(itemsOwned);
+						buyer.sendMessage("§ePurchase successful!");
+					} else {
+						buyer.sendMessage("§cYou already own this item!");
+					}
+				} else {
+					buyer.sendMessage("§cYou can't afford to purchase this item!");
+					return true;
+				}
+			}
+		}
+
 		if (cmd.getName().equalsIgnoreCase("forcedaily")) {
 			if (!sender.isOp()) {
 				sender.sendMessage("This is an admin-only command.");
@@ -228,42 +308,120 @@ public class Main extends JavaPlugin {
 				} else sender.sendMessage("§cPlayer not found.");
 			} else sender.sendMessage("§cUsage: /voteinternal <username>");
 		}
+
+		if (cmd.getName().equalsIgnoreCase("selectorinternal")) {
+			if (args.length == 3) {
+				/*
+				Argument 1: Player
+				Argument 2: Option
+				Argument 3: Category
+				 */
+
+				Player target = Bukkit.getPlayer(args[0]);
+				if (target == null) {
+					sender.sendMessage("§cPlayer not found.");
+					return true;
+				}
+				ParkourPlayer targetWrapped = PLAYERS.get(target.getUniqueId());
+
+				ShopCosmetic ItemToBuy;
+				try {
+					ItemToBuy = ShopCosmetic.valueOf(args[1]);
+				} catch(Error e) {
+					target.sendMessage("§cItem not found. Please report this!");
+					sender.sendMessage("Tried to buy invalid item: " + args[1]);
+					return true;
+				}
+
+				boolean result = setItemAsSelected(ItemToBuy,targetWrapped,args[2]);
+				if (result) {
+					target.sendMessage("§7Selected successfully!");
+				} else {
+					target.sendMessage("§cUnable to select item! You don't own it!");
+				}
+				return true;
+
+			}
+		}
+
 		if (cmd.getName().equalsIgnoreCase("endparkour")) {
+			if (args.length != 1) {
+				sender.sendMessage("§cIncorrect arguments. /endparkour <player>");
+				return true;
+			}
+			Player player = Bukkit.getPlayer(args[0]);
+			ParkourPlayer pp = Main.PLAYERS.get(player.getUniqueId());
+
+
 			if (!sender.isOp()) {
 				sender.sendMessage("This is an admin-only command.");
 				return true;
 			}
-			if (args.length == 1) {
-				if (times.containsKey(((Player) sender).getUniqueId())) {
-					long time = System.currentTimeMillis() - times.get(((Player) sender).getUniqueId());
-					//sender.sendMessage("Timing ended! Your time was " + readableTimeUnits(time));
-					
-					if (Main.PLAYERS.get(((Player)sender).getUniqueId()).getLocation() == -3) {
-						ParkourPlayer pp = Main.PLAYERS.get(((Player)sender).getUniqueId());
-						sender.sendMessage("§aYou've completed today's parkour challenge! §fYour time was §6" + readableTimeUnits(time) + "§f. To check your streak, hover over the clock in the menu.");
-						if (pp.getDailyTime() > 0) {
-							if (pp.getDailyTime() > time) pp.setDailyTime(time);
-						} else pp.setDailyTime(time);
-						pp.setDailyStreak(pp.getDailyStreak() + 1);
-						pp.sendPlayerToLocation(-1);
-						return true;
+
+			if (times.containsKey(player.getUniqueId())) {
+				long time = System.currentTimeMillis() - times.get(player.getUniqueId());
+
+				if (pp.getLocation() == -3) {
+					player.sendMessage("§aYou've completed today's parkour challenge! §fYour time was §6" + readableTimeUnits(time) + "§f. To check your streak, hover over the clock in the menu.");
+					if (pp.getDailyTime() > 0) {
+						if (pp.getDailyTime() > time) pp.setDailyTime(time);
+					} else {
+						pp.setDailyTime(time);
+						int coinsToAdd = 40 + (10 * pp.getDailyStreak());
+						player.sendMessage("§6You earned " + coinsToAdd + " coins (Daily Challenge)!");
+						pp.setCoinBalance(pp.getCoinBalance() + coinsToAdd);
 					}
-					
-					sender.sendMessage("§a> §lParkour Challenge Complete!"
-							+ "\n§a> §rYour time was §a§l"+readableTimeUnits(time)+"§r. To earn "
-							+ "\n§a> §ra §6§lGold star§r, your time needs to be"
-							+ "\n§a> §rfaster than §7" + readableTimeUnits(LEVELS.get(Integer.parseInt(args[0])).getGoldTime()) + "§r.");
-					PLAYERS.get(((Player)sender).getUniqueId()).addFeat(time, Integer.parseInt(args[0]));
-					times.remove(((Player) sender).getUniqueId());
-				} else sender.sendMessage("You're not being timed!");
-			} else sender.sendMessage("§cusage: /endparkour <id>");
-			
+
+					pp.setDailyStreak(pp.getDailyStreak() + 1);
+					return true;
+				}
+				int coinsToAdd;
+				String desc = "";
+				// Calculate coins earned
+				if (pp.bestTime(pp.getLocation()) > 0L) {
+					coinsToAdd = 100 + (10 * pp.getLocation());
+					desc+= "First Completion";
+				} else {
+					if (time < LEVELS.get(pp.getLocation()).getGoldTime()) {
+						// gold star time
+						coinsToAdd = 15 + (3 * pp.getLocation());
+						desc+= "Gold Star Time";
+					} else {
+						coinsToAdd = 5 + (2 * pp.getLocation());
+						desc+= "Level Completion";
+					}
+				}
+				pp.setCoinBalance(pp.getCoinBalance() + coinsToAdd);
+
+
+
+				player.sendMessage("§a> §lParkour Challenge Complete!"
+						+ "\n§a> §rYour time was §a§l"+readableTimeUnits(time)+"§r. To earn "
+						+ "\n§a> §ra §6§lGold star§r, your time needs to be"
+						+ "\n§a> §rfaster than §7" + readableTimeUnits(LEVELS.get(pp.getLocation()).getGoldTime()) + "§r.");
+				pp.addFeat(time, pp.getLocation());
+				times.remove(player.getUniqueId());
+				player.sendMessage("§6You earned " + coinsToAdd + " coins (" + desc + ")!");
+			} else player.sendMessage("You're not being timed!");
+			pp.sendPlayerToLocation(-1);
 		}
-		
 		return true;
 
 }
-		
-		
+
+public boolean setItemAsSelected(ShopCosmetic item, ParkourPlayer target,String category) {
+		// Check if item is within given category (and if the category exists)
+	if (buyable_items.containsKey(category)) {
+		if (Arrays.asList(buyable_items.get(category)).contains(item)) {
+			if (target.getOwnedCosmetics().contains(item)) {
+				HashMap<String, ShopCosmetic> selections = target.getSelectedItems();
+				selections.put(category,item);
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
 		
 }

@@ -38,7 +38,6 @@ public class DailyChallenges {
 				CD4 = r.nextInt(rmpt+1);
 				CD5 = r.nextInt(rmpt+1);
 				System.out.println("Generated new daily challenge: " + CD1 + ","+ CD2 + ","+ CD3 + ","+ CD4 + ","+ CD5 + ". RMPT: " + rmpt);
-				Location targetLocation = Bukkit.getWorld("LOBBY").getSpawnLocation();
 				for (Player p : Bukkit.getWorld("DC_WORLD").getPlayers()) {
 					p.sendMessage("§cThe time on the Daily Challenge has ran out. You will be moved to the lobby while the next daily challenge is prepared.");
 					ParkourPlayer pp = Main.PLAYERS.get(p.getUniqueId());

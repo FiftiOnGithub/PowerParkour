@@ -13,19 +13,39 @@ import org.bukkit.entity.Player;
 public class ParkourPlayer {
 
 	private final UUID uuid; // the uuid of the player
-	private HashMap<Integer,ArrayList<Long>> feats; // a hashmap with the id for every level as key, and an arraylist with every completion time as value. used to determine whether gold stars are earned etc.
-	private boolean plus; // has this person got plus?
-	private ArrayList<ShopCosmetic> owned_packages; // these are the items that the player owns.
 	private Integer playerLocation; //this is either a level id or "-1" (in lobby) or -3 in daily challenge
-	private Integer failedTimes; // how many times has this player failed on the current parkour
-	private String lastKnownName; // used by the leaderboards.
-	private Location lastGroundLocation; // where to tp the player back to if they die during practice mdoe
+	private Integer failedTimes; // how many times has this player failed on the current parkour. This is currently used only for advertising practice mode from plus
+	private String lastKnownName; // used by the leaderboards. More efficient than using getofflineplayer
 	private boolean pracMode; // practice mode?
-	
+	private HashMap<Integer,ArrayList<Long>> feats; // a hashmap with the id for every level as key, and an arraylist with every completion time as value. used to determine whether gold stars are earned etc.
+
+	// PlUS variables
+	private boolean plus; // has this person got plus?
+	private Location lastGroundLocation; // where to tp the player back to if they die during practice mode
+
+
+	// Daily Information
 	private Integer dailyStreak; // the number of dailies this person has done in a row without missing any
 	private long dailyTime; // their time on today's daly challenge.
 	private Integer dailyLives; // how many lives does this person have in today's daily challenge?
-	
+
+	// Shop Information
+	private ArrayList<ShopCosmetic> owned_cosmetics; // Every ShopCosmetic that the player owns.
+
+
+
+	/*
+        The following selections exist:
+        - JM : Join Messages
+        - CM : Completion Messages
+        - P  : Prefix
+
+            If a player does not have one of the selections, then that entry will not exist in the hashmap.
+         */
+	private HashMap<String,ShopCosmetic> selected_items; // The cosmetics that the player has selected.
+	private Integer coinBalance; // Current balance
+
+
 	public ParkourPlayer(UUID uid,HashMap<Integer,ArrayList<Long>> feat,boolean pl, Integer dailyL, Integer dailyS, long dailyT,String lnn) {
 		this.uuid = uid;
 		this.feats = feat;
@@ -101,11 +121,10 @@ public class ParkourPlayer {
 		return true;
 	}
 	
-	public boolean addFeat(Long time,Integer levelid) {
+	public void addFeat(Long time, Integer levelid) {
 		if (Main.LEVELS.get(levelid) != null) {
 			this.feats.get(levelid).add(time);
-			return true;
-		} return false;
+		}
 	}
 	public Long bestTime(Integer levelid) {
 		/*Long[] completions = new Long[this.feats.get(levelid).size()+10];
@@ -116,15 +135,17 @@ public class ParkourPlayer {
 		Arrays.sort(completions);
 		return completions[0];*/
 		ArrayList<Long> comps = this.feats.get(levelid);
+		if (comps == null || comps.size() == 0) {
+			return 0l;
+		}
 		Collections.sort(comps);
 		return comps.get(0);
 	}
 
 	/**
 	 * @param location the location to send the player to. Usually a level id (0 - infinity), or -1 for the lobby, or -3 for daily challenge world
-	 * @return nothing lol
 	 */
-	public boolean sendPlayerToLocation(Integer location) {
+	public void sendPlayerToLocation(Integer location) {
 		this.setFails(0);
 		this.setPracMode(false);
 		Main.times.remove(this.uuid);
@@ -136,12 +157,12 @@ public class ParkourPlayer {
 			player.teleport(Bukkit.getWorld("LOBBY").getSpawnLocation());
 		}
 		if (location >= 0) {
-			if (Main.LEVELS.size() < location) {
+			if (Main.LEVELS.size() > location) {
 				player.teleport(Bukkit.getWorld(Main.LEVELS.get(location).getLocation()).getSpawnLocation());
 				Main.times.put(this.uuid, System.currentTimeMillis());
 				this.setLocation(location);
 				Main.setPlayerInventory(player);
-				return true;
+				return;
 			} else {
 				player.sendMessage("Tried to teleport you to a level which doesn't exist. Please report this! ID: " + location);
 			}
@@ -160,7 +181,6 @@ public class ParkourPlayer {
 				else player.sendMessage("§aDaily challenge started! You have §4 infinite§a lives.");
 			} else player.sendMessage("§cYou're out of lives! To get more, you can §b§lVOTE §cfor our server. §7(Click here)");
 		}
-		return true;
 	}
 	public boolean hasGold(Integer levelid) {
 		if (this.feats.get(levelid).size() > 0) {
@@ -193,7 +213,29 @@ public class ParkourPlayer {
 		this.lastKnownName = lastKnownName;
 	}
 
+	public ArrayList<ShopCosmetic> getOwnedCosmetics() {
+		return owned_cosmetics;
+	}
 
+	public void setOwnedCosmetics(ArrayList<ShopCosmetic> owned_cosmetics) {
+		this.owned_cosmetics = owned_cosmetics;
+	}
+
+	public HashMap<String, ShopCosmetic> getSelectedItems() {
+		return selected_items;
+	}
+
+	public void setSelectedItems(HashMap<String, ShopCosmetic> selected_items) {
+		this.selected_items = selected_items;
+	}
+
+	public Integer getCoinBalance() {
+		return coinBalance;
+	}
+
+	public void setCoinBalance(Integer coinBalance) {
+		this.coinBalance = coinBalance;
+	}
 
 }
 

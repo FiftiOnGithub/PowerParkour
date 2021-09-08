@@ -109,11 +109,19 @@ public class EventsManager implements Listener {
 		if (player.getLocation() >= 0) {
 			// Return to lobby
 			if (e.getItem().getType() == Material.IRON_DOOR_BLOCK) {
-
+				player.sendPlayerToLocation(-1);
+				e.getPlayer().sendMessage("§aReturning you to lobby.");
 			}
 			// More options
 			if (e.getItem().getType() == Material.NETHER_STAR) {
-
+				//TODO: Add more options inventory
+				/*
+				The more options inventory will contain additional choices, such as:
+				- Hide players in world (this might be a PLUS feature?) Probably not
+				- Enter practice mode
+				- cosmetic selections?
+				*/
+				e.getPlayer().sendMessage("§eHere is the part where the more options inventory will open.");
 			}
 		}
 	}
