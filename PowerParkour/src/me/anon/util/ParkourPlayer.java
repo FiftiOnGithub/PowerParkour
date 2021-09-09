@@ -39,7 +39,7 @@ public class ParkourPlayer {
         The following selections exist:
         - JM : Join Messages
         - CM : Completion Messages
-        - P  : Prefix
+        - PF : Prefix
 
             If a player does not have one of the selections, then that entry will not exist in the hashmap.
          */
@@ -66,6 +66,7 @@ public class ParkourPlayer {
 
 		// TODO: Fix this
 		this.owned_cosmetics = owned_cosmetics;
+		System.out.println("instancer: " + this.owned_cosmetics.size());
 		this.coinBalance = coins;
 		this.selected_items = selected_items;
 		
@@ -158,6 +159,7 @@ public class ParkourPlayer {
 		Player player = Bukkit.getPlayer(this.uuid);
 		player.getInventory().clear();
 		player.setGameMode(GameMode.SURVIVAL);
+		this.setLastGround(null);
 		if (location == -1) {
 			this.setLocation(-1);
 			player.teleport(Bukkit.getWorld("LOBBY").getSpawnLocation());
@@ -245,7 +247,7 @@ public class ParkourPlayer {
 	}
 	public void addCoinBalance(Integer coinBalance,String reason,Player p) {
 		if (this.getOwnedCosmetics().contains(ShopCosmetic.MDT_ONE)) {
-			int coinsToAdd = Math.toIntExact(Math.round(this.coinBalance + (coinBalance * 1.2D)));
+			int coinsToAdd = Math.toIntExact(Math.round(coinBalance * 1.2D));
 			this.coinBalance = this.coinBalance + coinsToAdd;
 			if (p != null) p.sendMessage("§6You earned §l" + coinsToAdd + "§r§6 coins! (" + reason + ", Midas Touch)");
 		} else {

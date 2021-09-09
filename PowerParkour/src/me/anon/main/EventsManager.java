@@ -66,94 +66,7 @@ public class EventsManager implements Listener {
 	@EventHandler
 	public void onInventoryClick(InventoryClickEvent e) {
 		System.out.println("inventory click");
-		if (e.getCurrentItem() != null) e.setCancelled(true);
-		if (e.getInventory().getName().equals("§aParkour Selector")) {
-			if (e.getCurrentItem() == null) return;
-			if (!e.getCurrentItem().hasItemMeta()) return;
-			if (e.getCurrentItem().getItemMeta().hasLore()) {
-				ItemStack modifiableBase = CraftItemStack.asNMSCopy(e.getCurrentItem());
-				NBTTagCompound modifiableCompound = (modifiableBase.hasTag()) ? modifiableBase.getTag() : new NBTTagCompound();
-				int levelid = Integer.parseInt(modifiableCompound.getString("customid"));
-				Player p = (Player) e.getWhoClicked();
-				ParkourPlayer pp = Main.PLAYERS.get(p.getUniqueId());
-				//((Player) e.getWhoClicked()).sendMessage(levelid + " - " + Main.LEVELS.get(levelid).getName());
-				if (levelid < 0) {
-					if (levelid == -1) {
-						// return to lobby
-						p.sendMessage("§aYou have been returned to the lobby.");
-						pp.sendPlayerToLocation(-1);
-						return;
-					}
-					if (levelid == -2) {
-						e.getWhoClicked().closeInventory();
-						Main.advertisePlus((Player)e.getWhoClicked());
-						return;
-					}
-					if (levelid == -3) {
-						pp.sendPlayerToLocation(-3);
-						e.getWhoClicked().closeInventory();
-						return;
-						
-					}
-					return;
-				}
-				if (pp.canPlayLevel(levelid) == 0) {
-				pp.sendPlayerToLocation(levelid);
-				p.sendMessage("§aYou have started " + Main.LEVELS.get(levelid).getName() + "! Good luck :)");
-				} else p.sendMessage("§cYou can't play this level!");
-				e.getWhoClicked().closeInventory();
-			}
-		} else if (e.getInventory().getName().equals("§eStore")) {
-			if (e.getCurrentItem() == null) return;
-			if (!e.getCurrentItem().hasItemMeta()) return;
-			if (e.getCurrentItem().getItemMeta().hasLore()) {
-				ItemStack modifiableBase = CraftItemStack.asNMSCopy(e.getCurrentItem());
-				NBTTagCompound modifiableCompound = (modifiableBase.hasTag()) ? modifiableBase.getTag() : new NBTTagCompound();
-				String actionid = modifiableCompound.getString("customid");
-				ShopCosmetic cosmeticToBuy;
-				try {
-					cosmeticToBuy = ShopCosmetic.valueOf(actionid);
-				} catch(Error err) {
-					if (actionid.equals("no_action")) {
-						return;
-					} else {
-						System.out.println("Invalid action: " + actionid);
-						e.getWhoClicked().closeInventory();
-						return;
-					}
-				}
-
-				ParkourPlayer pp = Main.PLAYERS.get(e.getWhoClicked().getUniqueId());
-				if (pp.getOwnedCosmetics().contains(cosmeticToBuy)) {
-					// Selecting
-					if (e.getCurrentItem().getItemMeta().hasEnchants()) {
-						e.getWhoClicked().sendMessage("§cThis item is already selected.");
-						e.getWhoClicked().closeInventory();
-						return;
-					}
-					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "selectorinternal " + e.getWhoClicked().getName() + " " + cosmeticToBuy.toString() + " " + cosmeticToBuy.toString().split("_")[0]);
-				} else {
-					// Buying
-
-					if (e.getCurrentItem().getItemMeta().getLore().get(e.getCurrentItem().getItemMeta().getLore().size() - 1).startsWith("§cThis item")) {
-						e.getWhoClicked().sendMessage("§cYou can't buy this item right now!");
-						e.getWhoClicked().closeInventory();
-						return;
-					}
-
-					try {
-						int price = Integer.parseInt(e.getCurrentItem().getItemMeta().getLore().get(e.getCurrentItem().getItemMeta().getLore().size() - 1).split(" ")[5].substring(2));
-						Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "storeinternal " + e.getWhoClicked().getName() + " " + cosmeticToBuy.toString() + " " + price);
-
-					} catch(NumberFormatException error){
-						e.getWhoClicked().sendMessage("§cUnable to determine the price of this product. Report this as a bug.");
-					}
-
-				}
-
-			}
-			e.getWhoClicked().closeInventory();
-		}
+		InventoryClickManager.inventoryClickEvent(e);
 
 	}
 	@EventHandler
@@ -268,7 +181,7 @@ public class EventsManager implements Listener {
 			}
 			
 			
-			if (pp.isPracMode() && pp.getLastGround() != null) {
+			if (pp.getLastGround() != null) {
 				e.getPlayer().teleport(pp.getLastGround());
 				return;
 			}
@@ -277,7 +190,7 @@ public class EventsManager implements Listener {
 			Main.times.remove(e.getPlayer().getUniqueId());
 			Main.times.put(e.getPlayer().getUniqueId(),System.currentTimeMillis());
 			pp.setFails(pp.getFails() + 1);
-			if (pp.getFails() % 20 == 0) {
+			if (pp.getFails() % 20 == 0 && !pp.hasPlus()) {
 				e.getPlayer().sendMessage("§a> §3§lHaving trouble?" +
 						"\n§a> §6§lPLUS §rusers are able to use §bPractice Mode §rwhich" +
 						"\n§a> §rallows them to respawn right on the jump they fell." +
@@ -292,10 +205,28 @@ public class EventsManager implements Listener {
 		if (!(Math.floor(e.getFrom().getY()) == e.getFrom().getY())) {
 			if ((Math.floor(e.getTo().getY()) == e.getTo().getY())) {
 				ParkourPlayer pp = Main.PLAYERS.get(e.getPlayer().getUniqueId());
+				if (pp.getLocation() == -1) return;
 				if (pp.isPracMode()) {
 					Location location = new Location(e.getPlayer().getWorld(),e.getFrom().getX(),e.getFrom().getY(),e.getFrom().getZ());
 					location.setYaw(e.getPlayer().getLocation().getYaw());
 					pp.setLastGround(location);
+				} else {
+					int x = e.getTo().getBlockX();
+					int y = e.getTo().getBlockY() - 1;
+					int z = e.getTo().getBlockZ();
+					Material blockBelowMaterial = e.getPlayer().getWorld().getBlockAt(x,y,z).getType();
+					System.out.println(blockBelowMaterial.toString());
+					if (blockBelowMaterial == Material.GOLD_BLOCK) {
+						if (pp.getLastGround() == null || pp.getLastGround().distance(e.getPlayer().getLocation()) > 10) {
+							Location loc = e.getPlayer().getLocation();
+							loc.setPitch(0L);
+							pp.setLastGround(loc);
+							e.getPlayer().sendMessage(" \n§eYou have reached a §lCheckpoint§r§e!\n " +
+									"§eIf you fall now, you will be returned to this point. \n ");
+						}
+					} else if (blockBelowMaterial == Material.EMERALD_BLOCK) {
+						Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "endparkour " + e.getPlayer().getName());
+					}
 				}
 			}
 		}

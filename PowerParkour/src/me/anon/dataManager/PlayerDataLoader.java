@@ -75,19 +75,23 @@ public class PlayerDataLoader {
 
 				int coins = pdm.getConfig().getInt("players."+i+".coins");
 				ArrayList<ShopCosmetic> cosmetics = new ArrayList<ShopCosmetic>();
-				for (String ii : pdm.getConfig().getStringList("players"+i+".csm")) {
+				for (String ii : pdm.getConfig().getStringList("players."+i+".csm")) {
+					System.out.println("found owned cosmetic of player " + lnn + ". Cosmetic: " + ii);
 					ShopCosmetic cosmetic = ShopCosmetic.valueOf(ii);
 					cosmetics.add(cosmetic);
+					System.out.println(cosmetic.toString());
+					System.out.println(cosmetics.size());
 				}
 				HashMap<String,ShopCosmetic> selections = new HashMap<String,ShopCosmetic>();
 				for (String entry : pdm.getConfig().getConfigurationSection("players."+i+".selections").getKeys(false)) {
 					String selection = pdm.getConfig().getString("players."+i+".selections."+entry);
+					System.out.println(entry + " found");
 					selections.put(entry,ShopCosmetic.valueOf(selection));
 				}
 
 
 				new ParkourPlayer(uuid,feats,plus,dailyLives,dailyStreak,dailyTime,lnn,cosmetics,coins,selections);
-				System.out.println("Loaded " + uuid + ". They have " + feats.size() + " feats.");
+				System.out.println("Loaded " + uuid + ". Name: " + lnn + ". They have " + feats.size() + " feats. Cosmetics: " + cosmetics.size());
 				
 			}
 		}

@@ -30,7 +30,7 @@ public class ShopGUI {
             if (p.hasPlus()) {
                 lore.add("§7Show your support for the server");
                 lore.add("§7with this cool chat prefix!");
-                inventory.setItem(10, setBasedOnOwnership(p, "PF", ShopCosmetic.PF_PLUS, 0, "[§6P§l§r§f] Tag", Material.GOLD_INGOT, lore));
+                inventory.setItem(10, setBasedOnOwnership(p, "PF", ShopCosmetic.PF_PLUS, 0, "[§6§lP§r§f] Tag", Material.GOLD_INGOT, lore));
             } else {
                 lore.add("§7Show your support for the server");
                 lore.add("§7with this cool chat prefix!");
@@ -59,7 +59,7 @@ public class ShopGUI {
             inventory.setItem(13, setBasedOnOwnership(p, "PF", ShopCosmetic.PF_SMALLSTAR, 200, "[§d✩§f] Tag", Material.GLOWSTONE_DUST, lore));
             lore.clear();
             lore.add("§7A big star for a great player!");
-            inventory.setItem(14, setBasedOnOwnership(p, "PF", ShopCosmetic.PF_BIGSTAR, 800, "[§5✯§f] Tag", Material.GLOWSTONE_DUST, lore));
+            inventory.setItem(14, setBasedOnOwnership(p, "PF", ShopCosmetic.PF_BIGSTAR, 800, "[§5✯§f] Tag", Material.GLOWSTONE, lore));
             lore.clear();
             lore.add("§7Show your dedication to the server!");
             inventory.setItem(15, setBasedOnOwnership(p, "PF", ShopCosmetic.PF_PRO, 1500, "[§cPRO§f] Tag", Material.REDSTONE, lore));
