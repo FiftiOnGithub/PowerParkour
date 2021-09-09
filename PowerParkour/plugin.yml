@@ -50,3 +50,6 @@ commands:
     openstoreinventory:
        description: Open the store inventory for a desired player
        usage: /openstoreinventory <ign>
+    coinmanager:
+       description: manage coin balance of players
+       usage: /coinmanager <player>

@@ -47,7 +47,7 @@ public class ParkourPlayer {
 	private Integer coinBalance; // Current balance
 
 
-	public ParkourPlayer(UUID uid,HashMap<Integer,ArrayList<Long>> feat,boolean pl, Integer dailyL, Integer dailyS, long dailyT,String lnn) {
+	public ParkourPlayer(UUID uid,HashMap<Integer,ArrayList<Long>> feat,boolean pl, Integer dailyL, Integer dailyS, long dailyT,String lnn,ArrayList<ShopCosmetic> owned_cosmetics, int coins, HashMap<String,ShopCosmetic> selected_items) {
 		this.uuid = uid;
 		this.feats = feat;
 		this.plus = pl;
@@ -65,9 +65,9 @@ public class ParkourPlayer {
 
 
 		// TODO: Fix this
-		this.owned_cosmetics = new ArrayList<ShopCosmetic>();
-		this.coinBalance = 0;
-		this.selected_items = new HashMap<String,ShopCosmetic>();
+		this.owned_cosmetics = owned_cosmetics;
+		this.coinBalance = coins;
+		this.selected_items = selected_items;
 		
 		Main.PLAYERS.put(uuid, this);
 	}
@@ -142,7 +142,7 @@ public class ParkourPlayer {
 		return completions[0];*/
 		ArrayList<Long> comps = this.feats.get(levelid);
 		if (comps == null || comps.size() == 0) {
-			return 0l;
+			return 999999999999L;
 		}
 		Collections.sort(comps);
 		return comps.get(0);
@@ -239,8 +239,19 @@ public class ParkourPlayer {
 		return coinBalance;
 	}
 
+	@Deprecated
 	public void setCoinBalance(Integer coinBalance) {
 		this.coinBalance = coinBalance;
+	}
+	public void addCoinBalance(Integer coinBalance,String reason,Player p) {
+		if (this.getOwnedCosmetics().contains(ShopCosmetic.MDT_ONE)) {
+			int coinsToAdd = Math.toIntExact(Math.round(this.coinBalance + (coinBalance * 1.2D)));
+			this.coinBalance = this.coinBalance + coinsToAdd;
+			if (p != null) p.sendMessage("§6You earned §l" + coinsToAdd + "§r§6 coins! (" + reason + ", Midas Touch)");
+		} else {
+			this.coinBalance = Math.toIntExact(Math.round(this.coinBalance + coinBalance));
+			if (p != null) p.sendMessage("§6You earned §l" + coinBalance + "§r§6 coins! (" + reason + ")");
+		}
 	}
 
 }

@@ -10,6 +10,7 @@ import java.util.Random;
 import java.util.UUID;
 
 import me.anon.util.ParkourPlayer;
+import me.anon.util.ShopCosmetic;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -61,7 +62,10 @@ public class DailyChallenges {
 					} else {
 						pp.setDailyTime(0);
 					}
-					pp.setLives(3);
+					if (pp.hasPlus()) pp.setLives(5); else pp.setLives(3);
+					if (pp.getOwnedCosmetics().contains(ShopCosmetic.DC_EXTRA_ONE)) {
+						pp.setLives(pp.getLives() + 1);
+					}
 					
 				}
 				Bukkit.broadcastMessage("§a§lA new daily challenge has arrived! To start it, click the clock item in the parkour selector!");

@@ -10,6 +10,7 @@ import me.anon.main.DailyChallenges;
 import me.anon.main.Main;
 import me.anon.util.ParkourLevel;
 import me.anon.util.ParkourPlayer;
+import me.anon.util.ShopCosmetic;
 import org.bukkit.configuration.ConfigurationSection;
 
 public class PlayerDataLoader {
@@ -57,7 +58,35 @@ public class PlayerDataLoader {
 				
 				long dailyTime = pdm.getConfig().getLong("players."+i+".dailyTime");
 				String lnn = pdm.getConfig().getString("players."+i+".username");
-				new ParkourPlayer(uuid,feats,plus,dailyLives,dailyStreak,dailyTime,lnn);
+
+				/*
+				pdm.getConfig().set("players."+ent.getKey().toString()+".coins",ent.getValue().getCoinBalance());
+
+				for (Entry<String, ShopCosmetic> entry : ent.getValue().getSelectedItems().entrySet()) {
+					pdm.getConfig().set("players."+ent.getKey().toString()+".selections."+entry.getKey(),entry.getValue().toString());
+				}
+				ArrayList<String> cosmetics = new ArrayList<>();
+				for (ShopCosmetic cosmetic : ent.getValue().getOwnedCosmetics()) {
+					cosmetics.add(cosmetic.toString());
+				}
+				pdm.getConfig().set("players."+ent.getKey().toString()+".csm",cosmetics);
+				*/
+
+
+				int coins = pdm.getConfig().getInt("players."+i+".coins");
+				ArrayList<ShopCosmetic> cosmetics = new ArrayList<ShopCosmetic>();
+				for (String ii : pdm.getConfig().getStringList("players"+i+".csm")) {
+					ShopCosmetic cosmetic = ShopCosmetic.valueOf(ii);
+					cosmetics.add(cosmetic);
+				}
+				HashMap<String,ShopCosmetic> selections = new HashMap<String,ShopCosmetic>();
+				for (String entry : pdm.getConfig().getConfigurationSection("players."+i+".selections").getKeys(false)) {
+					String selection = pdm.getConfig().getString("players."+i+".selections."+entry);
+					selections.put(entry,ShopCosmetic.valueOf(selection));
+				}
+
+
+				new ParkourPlayer(uuid,feats,plus,dailyLives,dailyStreak,dailyTime,lnn,cosmetics,coins,selections);
 				System.out.println("Loaded " + uuid + ". They have " + feats.size() + " feats.");
 				
 			}
@@ -94,6 +123,23 @@ public class PlayerDataLoader {
 			pdm.getConfig().set("players."+ent.getKey().toString()+".dailyStreak", ent.getValue().getDailyStreak());
 			pdm.getConfig().set("players."+ent.getKey().toString()+".dailyTime", ent.getValue().getDailyTime());
 			pdm.getConfig().set("players."+ent.getKey().toString()+".username", ent.getValue().getLastKnownName());
+
+
+
+
+			pdm.getConfig().set("players."+ent.getKey().toString()+".coins",ent.getValue().getCoinBalance());
+
+			for (Entry<String, ShopCosmetic> entry : ent.getValue().getSelectedItems().entrySet()) {
+				pdm.getConfig().set("players."+ent.getKey().toString()+".selections."+entry.getKey(),entry.getValue().toString());
+			}
+			ArrayList<String> cosmetics = new ArrayList<>();
+			for (ShopCosmetic cosmetic : ent.getValue().getOwnedCosmetics()) {
+				cosmetics.add(cosmetic.toString());
+			}
+			pdm.getConfig().set("players."+ent.getKey().toString()+".csm",cosmetics);
+
+
+
 			System.out.println("Saved player " + ent.getValue().getLastKnownName());
 		}
 		System.out.println("Completed player data save.");

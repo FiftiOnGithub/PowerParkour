@@ -20,6 +20,8 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Objects;
 
 public class EventsManager implements Listener {
@@ -28,30 +30,43 @@ public class EventsManager implements Listener {
 	@EventHandler
 	public void onJoin(PlayerJoinEvent e) {
 		if (Main.PLAYERS.containsKey(e.getPlayer().getUniqueId())) {
-			e.getPlayer().sendMessage("§b>");
+			e.getPlayer().sendMessage("§b ");
 			e.getPlayer().sendMessage("§6§lWelcome back!");
-			e.getPlayer().sendMessage("§rWelcome back to ParkourPower. Hopefully you have a good time :D");
-			e.getPlayer().sendMessage("§b>");
+			e.getPlayer().sendMessage("§rWelcome back to ParkourPower.");
+			e.getPlayer().sendMessage("§b ");
 			ParkourPlayer p = Main.PLAYERS.get(e.getPlayer().getUniqueId());
 			if (!Objects.equals(p.getLastKnownName(), e.getPlayer().getName())) p.setLastKnownName(e.getPlayer().getName());
 			if (p.getDailyTime() == 0) {
 				e.getPlayer().sendMessage("§aYou haven't completed today's daily challenge yet! To play the daily challenge, click the clock in the parkour menu!");
 			}
 			if (p.hasPlus()) e.getPlayer().setPlayerListName("§f[§6§lP§f] " + e.getPlayer().getName());
-			if (p.hasPlus()) e.setJoinMessage("§6§l" + e.getPlayer().getName() + " §7has joined the game!"); else e.setJoinMessage(null);
+			if (p.getSelectedItems().get("JM") != null) {
+				switch(p.getSelectedItems().get("JM")) {
+					case JM_BASIC:
+						if (p.hasPlus()) {
+							e.setJoinMessage("§6§l" + e.getPlayer().getName() + "§7 has joined the game.");
+						} else {
+							e.setJoinMessage("§7" + e.getPlayer().getName() + "§7 has joined the game.");
+						}
+						break;
+					case JM_RAINBOW:
+						e.setJoinMessage(Main.rainbow(e.getPlayer().getName() + " has joined the game!"));
+						break;
+				}
+			}
 
 		} else {
 			e.getPlayer().sendMessage("§b>");
 			e.getPlayer().sendMessage("§6§lWelcome to ParkourPower!");
 			e.getPlayer().sendMessage("§rParkourPower is a new minecraft server made specifically for parkour. \nIf you want to jump straight in, then go click the §c§lCaptain §rin front of you.\n\n§b> §rIf you want to learn about our rules, do §e/rules§r. If you want to learn about the server, do §e/info§r.");
 			e.getPlayer().sendMessage("§b>");
-			new ParkourPlayer(e.getPlayer().getUniqueId(),Main.getEmptyCompMap(),false,3,0,0,e.getPlayer().getName());
+			new ParkourPlayer(e.getPlayer().getUniqueId(),Main.getEmptyCompMap(),false,3,0,0,e.getPlayer().getName(),new ArrayList<ShopCosmetic>(),0,new HashMap<String,ShopCosmetic>());
 		}
 	}
 	@EventHandler
 	public void onInventoryClick(InventoryClickEvent e) {
-		e.setCancelled(true);
 		System.out.println("inventory click");
+		if (e.getCurrentItem() != null) e.setCancelled(true);
 		if (e.getInventory().getName().equals("§aParkour Selector")) {
 			if (e.getCurrentItem() == null) return;
 			if (!e.getCurrentItem().hasItemMeta()) return;
@@ -86,6 +101,7 @@ public class EventsManager implements Listener {
 				pp.sendPlayerToLocation(levelid);
 				p.sendMessage("§aYou have started " + Main.LEVELS.get(levelid).getName() + "! Good luck :)");
 				} else p.sendMessage("§cYou can't play this level!");
+				e.getWhoClicked().closeInventory();
 			}
 		} else if (e.getInventory().getName().equals("§eStore")) {
 			if (e.getCurrentItem() == null) return;
@@ -136,8 +152,9 @@ public class EventsManager implements Listener {
 				}
 
 			}
+			e.getWhoClicked().closeInventory();
 		}
-		e.getWhoClicked().closeInventory();
+
 	}
 	@EventHandler
 	public void FoodChangeEvent(FoodLevelChangeEvent e) {
@@ -163,23 +180,27 @@ public class EventsManager implements Listener {
 	public void PlayerInteractEvent(PlayerInteractEvent e) {
 		System.out.println("PlayerInteractEvent!");
 		ParkourPlayer player = Main.PLAYERS.get(e.getPlayer().getUniqueId());
-		if (player.getLocation() >= 0) {
+		if (player.getLocation() >= 0 || player.getLocation() == -3) {
 			// Return to lobby
-			if (e.getItem().getType() == Material.IRON_DOOR_BLOCK) {
-				player.sendPlayerToLocation(-1);
-				e.getPlayer().sendMessage("§aReturning you to lobby.");
-			}
-			// More options
-			if (e.getItem().getType() == Material.NETHER_STAR) {
-				//TODO: Add more options inventory
+			if (e.getItem() != null) {
+				System.out.println(e.getItem().getType().toString());
+				if (e.getItem().getType() == Material.IRON_DOOR) {
+					player.sendPlayerToLocation(-1);
+					e.getPlayer().sendMessage("§aReturning you to lobby.");
+				}
+				// More options
+				if (e.getItem().getType() == Material.NETHER_STAR) {
+					//TODO: Add more options inventory
 				/*
 				The more options inventory will contain additional choices, such as:
 				- Hide players in world (this might be a PLUS feature?) Probably not
 				- Enter practice mode
 				- cosmetic selections?
 				*/
-				e.getPlayer().sendMessage("§eHere is the part where the more options inventory will open.");
+					e.getPlayer().sendMessage("§eHere is the part where the more options inventory will open.");
+				}
 			}
+
 		}
 	}
 	@EventHandler 
@@ -187,8 +208,32 @@ public class EventsManager implements Listener {
 		e.setCancelled(true);
 		String tag = "";
 		ParkourPlayer p = Main.PLAYERS.get(e.getPlayer().getUniqueId());
-		if (p.hasPlus()) tag = "§f[§6§lP§f] ";
-		if (e.getPlayer().isOp()) tag = "§f[§4§lSTAFF§f] ";
+		if (p.getSelectedItems().get("PF") != null) {
+			switch (p.getSelectedItems().get("PF")) {
+				case PF_PLUS:
+					tag = "§r[§6§lP§r] ";
+					break;
+				case PF_STAFF:
+					tag = "§r[§a§lSTAFF§r] ";
+					break;
+				case PF_PRO:
+					tag = "[§cPRO§f] ";
+					break;
+				case PF_CHRISTMAS_TREE:
+					tag = "[§2❄§f]";
+					break;
+				case PF_BIGSTAR:
+					tag = "[§5✯§f] ";
+					break;
+				case PF_SMALLSTAR:
+					tag = "[§d✩§f]";
+					break;
+				case PF_NONE:
+					tag = "";
+					break;
+			}
+		}
+
 		String msg = e.getMessage();
 		if (!p.hasPlus()) msg = "§7" + msg;
 		String name = e.getPlayer().getName();
@@ -248,8 +293,9 @@ public class EventsManager implements Listener {
 			if ((Math.floor(e.getTo().getY()) == e.getTo().getY())) {
 				ParkourPlayer pp = Main.PLAYERS.get(e.getPlayer().getUniqueId());
 				if (pp.isPracMode()) {
-					pp.setLastGround(new Location(e.getPlayer().getWorld(),e.getFrom().getX(),e.getFrom().getY(),e.getFrom().getZ()));
-					e.getPlayer().sendMessage("§aPractice Mode checkpoint!");
+					Location location = new Location(e.getPlayer().getWorld(),e.getFrom().getX(),e.getFrom().getY(),e.getFrom().getZ());
+					location.setYaw(e.getPlayer().getLocation().getYaw());
+					pp.setLastGround(location);
 				}
 			}
 		}
