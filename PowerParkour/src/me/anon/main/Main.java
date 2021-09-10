@@ -94,13 +94,13 @@ public class Main extends JavaPlugin {
 		String[] rainbow = {"4","c","6","e","6","c"};
 		int pos = 0;
 		ArrayList<String> messageSplit = new ArrayList<String>(Arrays.asList(message.split("")));
-		String newmessage = "";
+		StringBuilder newmessage = new StringBuilder();
 		for (String i : messageSplit) {
-			newmessage+=("§"+rainbow[pos]+i);
+			newmessage.append("§").append(rainbow[pos]).append(i);
 			pos++;
 			if (rainbow.length == pos) pos = 0;
 		}
-		return newmessage;
+		return newmessage.toString();
 	}
 
 	public static void setPlayerInventory(Player p) {
@@ -221,9 +221,9 @@ public class Main extends JavaPlugin {
 					
 					if (Bukkit.getPlayer(args[0]) != null) {
 						Bukkit.getPlayer(args[0]).sendMessage("§aYou have become a §6§lPLUS §amember! Congratulations!"
-								+"\n§fTo receive the full benefits of the package, please re-log onto the server."
+								+ "\n§fTo receive the full benefits of the package, please re-log onto the server."
 								+ "\n§fYou will receive your bonus §bDaily Challenge §flives when the daily challenge resets."
-								+"\n§a§lThanks for your support!");
+								+ "\n§a§lThanks for your support!");
 					}
 					
 				} else sender.sendMessage("§cPlayer not found.");

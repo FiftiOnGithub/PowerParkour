@@ -6,6 +6,7 @@ import me.anon.util.ShopCosmetic;
 import net.minecraft.server.v1_8_R3.ItemStack;
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
@@ -156,7 +157,7 @@ public class EventsManager implements Listener {
 	
 	@EventHandler
 	public void onPlayerMove(PlayerMoveEvent e) {
-		if (e.getTo().getY() < 30) {
+		if (e.getTo().getY() < 30 && e.getPlayer().getGameMode() != GameMode.CREATIVE) {
 			
 			ParkourPlayer pp = Main.PLAYERS.get(e.getPlayer().getUniqueId());
 			
