@@ -1,6 +1,7 @@
 package me.anon.main;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import me.anon.util.ParkourLevel;
 import me.anon.util.ParkourPlayer;
@@ -14,67 +15,65 @@ public class ParkourGUI {
 	
 	public static Inventory getInv(ParkourPlayer p) {
 		Inventory base = Bukkit.createInventory(null, 54,"§aParkour Selector");
-		int ii = 0;
-		for (ParkourLevel i : Main.LEVELS) {
-			{
-				String displayName = "§5§lBUG HAPPENED!";
-				ArrayList<String> lore = new ArrayList<>();
-				Material mat = Material.COMMAND;
-				if (p.getFeats().get(ii).size() > 0) {
-					if (p.hasGold(ii)) {
-						displayName = "§6§l✭ " + i.getName()+ " ✭";
-						mat = Material.GOLD_BLOCK;
-					} else {
-						displayName = "§a§l" + i.getName();
-						mat = Material.IRON_BLOCK;
-					}
-					lore.add("§7Your best time: " + Main.readableTimeUnits(p.bestTime(ii)));
-					lore.add("§6Gold star §7time: " + Main.readableTimeUnits(i.getGoldTime()));
-					lore.add("§7Times you've completed: " + p.getFeats().get(ii).size());
+		for (Map.Entry<Integer,ParkourLevel> entry : Main.LEVELS.entrySet()) {
+			ParkourLevel i = entry.getValue();
+			Integer ii = entry.getKey();
+			String displayName = "§5§lBUG HAPPENED!";
+			ArrayList<String> lore = new ArrayList<>();
+			Material mat = Material.COMMAND;
+			if (p.getFeats().get(ii).size() > 0) {
+				if (p.hasGold(ii)) {
+					displayName = "§6§l✭ " + i.getName()+ " ✭";
+					mat = Material.GOLD_BLOCK;
 				} else {
-					int cpl = p.canPlayLevel(ii);
-					switch (cpl) {
-						case 0: {
-							mat = Material.EMERALD;
-							displayName = "§a§l" + i.getName();
-							lore.add("§aYou can play this level right now!");
-							lore.add("§aClick here to enter!");
-							break;
-						}
-						case 1: {
-							mat = Material.WOOD_BUTTON;
-							displayName = "§e§l" + i.getName();
-							lore.add("§cYou haven't yet completed");
-							lore.add("§cthe level before this!");
-							break;
-						}
-						case 2: {
-							mat = Material.STONE_PLATE;
-							displayName = "§6§l" + i.getName();
-							lore.add("§cTo play this level,");
-							lore.add("§cyou need to get a §6§lGold star");
-							lore.add("§cin every other level (except plus ones)");
-							break;
-						}
-						case 3: {
-							mat = Material.STONE_BUTTON;
-							displayName = "§b§l" + i.getName();
-							lore.add("§cThis level is for §6PLUS §crank only.");
-							lore.add("§cTo learn more about §6PLUS§c, do /plus");
-							break;
-						}
-						case 4: {
-							displayName = "§4§l" + i.getName();
-							lore.add("§4A bug has happened. Contact admins about this with the level name and your username.");
-							break;
-						}
+					displayName = "§a§l" + i.getName();
+					mat = Material.IRON_BLOCK;
+				}
+				lore.add("§7Your best time: " + Main.readableTimeUnits(p.bestTime(ii)));
+				lore.add("§6Gold star §7time: " + Main.readableTimeUnits(i.getGoldTime()));
+				lore.add("§7Times you've completed: " + p.getFeats().get(ii).size());
+			} else {
+				int cpl = p.canPlayLevel(ii);
+				switch (cpl) {
+					case 0: {
+						mat = Material.EMERALD;
+						displayName = "§a§l" + i.getName();
+						lore.add("§aYou can play this level right now!");
+						lore.add("§aClick here to enter!");
+						break;
+					}
+					case 1: {
+						mat = Material.WOOD_BUTTON;
+						displayName = "§e§l" + i.getName();
+						lore.add("§cYou haven't yet completed");
+						lore.add("§cthe level before this!");
+						break;
+					}
+					case 2: {
+						mat = Material.STONE_PLATE;
+						displayName = "§6§l" + i.getName();
+						lore.add("§cTo play this level,");
+						lore.add("§cyou need to get a §6§lGold star");
+						lore.add("§cin every other level (except plus ones)");
+						break;
+					}
+					case 3: {
+						mat = Material.STONE_BUTTON;
+						displayName = "§b§l" + i.getName();
+						lore.add("§cThis level is for §6PLUS §crank only.");
+						lore.add("§cTo learn more about §6PLUS§c, do /plus");
+						break;
+					}
+					case 4: {
+						displayName = "§4§l" + i.getName();
+						lore.add("§4A bug has happened. Contact admins about this with the level name and your username.");
+						break;
 					}
 				}
-			 	// Entry is ii
-				ItemStack item = UtilFunctions.itemFactory(String.valueOf(ii),displayName,mat,lore,false);
-				base.setItem(i.getChestPos(), item);
 			}
-			ii++;
+			// Entry is ii
+			ItemStack item = UtilFunctions.itemFactory(String.valueOf(ii),displayName,mat,lore,false);
+			base.setItem(i.getChestPos(), item);
 		}
 
 		ArrayList<String> lore = new ArrayList<>();

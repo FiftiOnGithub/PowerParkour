@@ -9,14 +9,16 @@ public class ParkourLevel {
 	private final Integer chestPos;
 	private final String location;
 	private final long goldTime;
+	private final Integer id;
 	
-	public ParkourLevel(String n,Integer co,Integer cp,String loc,long gt) {
+	public ParkourLevel(Integer levelid, String n,Integer co,Integer cp,String loc,long gt) {
 		this.name = n;
 		this.condition = co;
 		this.chestPos = cp;
 		this.location = loc;
 		this.goldTime = gt;
-		Main.LEVELS.add(this);
+		this.id = levelid;
+		Main.LEVELS.put(levelid,this);
 	}
 	
 	
@@ -35,5 +37,6 @@ public class ParkourLevel {
 	public String getName() {
 		return name;
 	}
+	public Integer getID() { return id; }
 	
 }

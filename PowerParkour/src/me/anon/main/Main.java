@@ -25,7 +25,7 @@ public class Main extends JavaPlugin {
 	PlayerDataLoader pdl;
 	
 	public FileConfiguration config;
-	public static ArrayList<ParkourLevel> LEVELS = new ArrayList<ParkourLevel>();
+	public static HashMap<Integer,ParkourLevel> LEVELS = new HashMap<Integer, ParkourLevel>();
 	public static HashMap<UUID, ParkourPlayer> PLAYERS = new HashMap<UUID,ParkourPlayer>();
 	public static HashMap<UUID,Long> times = new HashMap<UUID, Long>();
 	public static HashMap<String, ShopCosmetic[]> buyable_items = new HashMap<String, ShopCosmetic[]>();
@@ -120,10 +120,8 @@ public class Main extends JavaPlugin {
 
 	public static HashMap<Integer,ArrayList<Long>> getEmptyCompMap() {
 		HashMap<Integer,ArrayList<Long>> map = new HashMap<>();
-		int ii = 0;
-		for (ParkourLevel ignored : LEVELS) {
-			map.put(ii, new ArrayList<>());
-			ii++;
+		for (Integer id : LEVELS.keySet()) {
+			map.put(id, new ArrayList<>());
 		}
 		return map;
 	}
@@ -133,9 +131,8 @@ public class Main extends JavaPlugin {
 				+"\n§fPLUS is a §blifetime §fpurchase, which you make once and benefit from for as long as you play on our network. The price of PLUS is §b5.00$§f. For that price, you get:"
 				+"\n- §bPractice Mode"
 				+"\n§f- Special §f[§6§lP§r§f] tag in chat and the tab List"
-				+"\n§f- Join announcements"
-				+"\n§f- Extra daily challenge lives"
-				+"\n§f- 3 more full parkour levels");
+				+"\n§f- White chat messages"
+				+"\n§f- Extra daily challenge lives");
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -145,12 +142,19 @@ public class Main extends JavaPlugin {
 				sender.sendMessage("This is an admin-only command.");
 				return true;
 			}
-			for (ParkourLevel i : LEVELS) {
-				sender.sendMessage("Name: " + i.getName());
-				sender.sendMessage("Location: " + i.getLocation());
-				sender.sendMessage("Gold time: " + i.getGoldTime());
-				sender.sendMessage("Condition: " + i.getCondition());
+			for (Entry<Integer, ParkourLevel> i : LEVELS.entrySet()) {
+				sender.sendMessage("Name: " + i.getValue().getName() + " ID: " + i.getValue().getID());
+				sender.sendMessage("Location: " + i.getValue().getLocation());
+				sender.sendMessage("Gold time: " + i.getValue().getGoldTime());
+				sender.sendMessage("Condition: " + i.getValue().getCondition());
+				sender.sendMessage("Level ID in DB (this should §calways§f be the same as the level ID: " + i.getKey());
 				sender.sendMessage("-------------------");
+			}
+			for (Entry<Integer, ArrayList<Long>> comp : PLAYERS.get(((Player) sender).getUniqueId()).getFeats().entrySet()) {
+				sender.sendMessage(comp.getKey() + " - Comps: " + comp.getValue().size());
+				for (Long ii : comp.getValue()) {
+					sender.sendMessage("- " + ii);
+				}
 			}
 		}
 		if (cmd.getName().equalsIgnoreCase("start")) {
@@ -165,8 +169,10 @@ public class Main extends JavaPlugin {
 		}
 		
 		if (cmd.getName().equalsIgnoreCase("parkourmenu")) {
-			System.out.println("Opening parkour inventory");
-			((Player) sender).openInventory(ParkourGUI.getInv(PLAYERS.get(((Player)sender).getUniqueId())));
+			if (args.length == 1 && sender.isOp()) {
+				Bukkit.getPlayer(args[0]).openInventory(ParkourGUI.getInv(PLAYERS.get(Bukkit.getPlayer(args[0]).getUniqueId())));
+			}
+
 		}
 
 		if (cmd.getName().equalsIgnoreCase("coinmanager")) {
@@ -407,14 +413,12 @@ public class Main extends JavaPlugin {
 					if (time < LEVELS.get(pp.getLocation()).getGoldTime()) {
 						// gold star time
 						coinsToAdd = 15 + (3 * pp.getLocation());
-						desc+= "Gold Star Time";
+						desc += "Gold Star Time";
 					} else {
 						coinsToAdd = 5 + (2 * pp.getLocation());
-						desc+= "Level Completion";
+						desc += "Level Completion";
 					}
 				}
-				pp.addCoinBalance(coinsToAdd,desc,player);
-
 
 
 				player.sendMessage("§a> §lParkour Challenge Complete!"
@@ -422,12 +426,20 @@ public class Main extends JavaPlugin {
 						+ "\n§a> §ra §6§lGold star§r, your time needs to be"
 						+ "\n§a> §rfaster than §7" + readableTimeUnits(LEVELS.get(pp.getLocation()).getGoldTime()) + "§r.");
 
+				if (pp.isPracMode()) {
+					player.sendMessage("§aYou completed this level in §bPractice Mode" +
+							"\n§fTo earn gold stars and progress, you have to complete the level normally too.");
+					pp.sendPlayerToLocation(-1);
+					times.remove(player.getUniqueId());
+					return true;
+				}
+				pp.addCoinBalance(coinsToAdd,desc,player);
 				times.remove(player.getUniqueId());
 				String comp = "";
 				if (pp.getSelectedItems().get("CM") != null) {
 					switch (pp.getSelectedItems().get("CM")) {
 						case CM_BASIC:
-							comp = "§r"+ player.getName() + " §7has completed §f" + LEVELS.get(pp.getLocation()).getName() + " §7with a time of §f" + readableTimeUnits(time) + "§7! ";
+							comp = "§r§f"+ player.getName() + " §7has completed §f" + LEVELS.get(pp.getLocation()).getName() + " §7with a time of §f" + readableTimeUnits(time) + "§7! ";
 							break;
 						case CM_FLEX:
 							comp = "§c§l"+ player.getName() + " §r§7has now completed §f" + LEVELS.get(pp.getLocation()).getName() + " " + (pp.getFeats().get(pp.getLocation()).size() + 1) + " times! §7(" + readableTimeUnits(time) + ") ";
@@ -460,6 +472,13 @@ public boolean setItemAsSelected(ShopCosmetic item, ParkourPlayer target,String 
 		}
 	}
 	return false;
+}
+public static HashMap<String, ShopCosmetic> emptySelectionMap() {
+		HashMap<String,ShopCosmetic> sels = new HashMap<String,ShopCosmetic>();
+		sels.put("PF",ShopCosmetic.PF_NONE);
+		sels.put("JM",ShopCosmetic.JM_NONE);
+		sels.put("CM",ShopCosmetic.CM_NONE);
+		return sels;
 }
 
 		

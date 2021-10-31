@@ -53,8 +53,14 @@ public class ParkourPlayer {
 		this.plus = pl;
 		this.dailyLives = dailyL;
 		this.playerLocation = -1;
-		if (this.feats.size() != Main.LEVELS.size()) {
-			Bukkit.getLogger().severe("Unable to load feats for " + uid + ". Feats mismatch; user has " + this.feats.size() + " but there are " + Main.LEVELS.size() + " levels.");
+		if (this.feats.size() < Main.LEVELS.size()) {
+			System.out.println("Player had invalid number of feats, attempting to fix now");
+			for (ParkourLevel ii : Main.LEVELS.values()) {
+				if (this.feats.get(ii.getID()) == null) {
+					System.out.println("Missing feat in " + ii.getName());
+					this.feats.put(ii.getID(),new ArrayList<Long>());
+				}
+			}
 		}
 		this.setLastKnownName(lnn);
 		lastGroundLocation = null;
@@ -95,24 +101,32 @@ public class ParkourPlayer {
 	}
 	public int canPlayLevel(Integer levelid) {
 		int levelCondition = Main.LEVELS.get(levelid).getCondition();
-		if (this.feats.get(levelid).size() > 0) return 0; // Can play
-		if (levelCondition == 0) return 0; // can play
-		if (this.feats.get(levelid - 1).size() > 0 && levelCondition == 1) return 0; // Can play, condition is 1 and completed previous level
-		if (levelCondition == 3 && this.plus) return 0; // Can play, this level requires plus and this player has it
-		if (levelCondition == 2) {
-			for (int i = 0; i < Main.LEVELS.size(); i++) {
-				System.out.println("Doing test on " + Main.LEVELS.get(i).getName());
-				System.out.println("has gold: " + hasGold(i));
-				System.out.println("Condition: " + Main.LEVELS.get(i).getCondition());
-				System.out.println("Failed checks: " + (!hasGold(i) && Main.LEVELS.get(i).getCondition() == 1));
-				if (!hasGold(i) && Main.LEVELS.get(i).getCondition() == 1) return 2; // Can't play; this level requires all gold stars and this player is missing a gold star in at least 1 level
-			}
-			System.out.println("Player has all gold");
-			return 0; // if the previous for loop completed successfully, then this player has gold stars from every level.
+		/*
+		Conditions:
+		0 - no requirements
+		2 - must have gold star from all previous levels
+		3 - plus
+		99+ - must have completed level with id (condition - 100)
+		 */
+		switch (levelCondition) {
+			case 0:
+				return 0;
+			case 2:
+				for (ParkourLevel i : Main.LEVELS.values()) {
+					if (!hasGold(i.getID()) && i.getCondition() == 1) return 2; // Can't play; this level requires all gold stars and this player is missing a gold star in at least 1 level
+				}
+				System.out.println("Player has all gold");
+				return 0;
+			case 3:
+				if (hasPlus()) return 0;
+				return 3;
+			default:
+				if (levelCondition > 99 && this.feats.get(levelCondition - 100) != null) {
+					if (this.feats.get(levelCondition - 100).size() > 0) {
+						return 0;
+					} return 1;
+				} return 4;
 		}
-		if (levelCondition == 3) return 3; // Can't play; this level requires plus and this player doesn't have it.
-		if (levelCondition == 1) return 1; // can't play because hasn't completed previous level
-		return 4; // this is a debug mode; the string should never show up in game.
 	}
 	public void setPlus(boolean targ) {
 		plus = targ;

@@ -75,7 +75,7 @@ public class ShopGUI {
             lore.add("§7Tell other players when you join and leave!");
             inventory.setItem(28, setBasedOnOwnership(p, "JM", ShopCosmetic.JM_BASIC, 250, "§7Basic join & leave messages (Gray)", Material.DEAD_BUSH, lore));
             lore.clear();
-            lore.add("§7Send a " + Main.rainbow("colourful") + "§7message to everyone when you join or leave!");
+            lore.add("§7Send a " + Main.rainbow("colourful") + "§7 message to everyone when you join or leave!");
             inventory.setItem(29, setBasedOnOwnership(p, "JM", ShopCosmetic.JM_RAINBOW, 10000, Main.rainbow("Rainbow Join & Leave messages"), Material.PAINTING, lore));
             lore.clear();
             lore.add("§7No join & leave messages");

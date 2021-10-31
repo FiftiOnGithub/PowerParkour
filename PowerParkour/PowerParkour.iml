@@ -24,9 +24,9 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="jdk" jdkName="JavaSE-1.8" jdkType="JavaSDK" />
     <orderEntry type="module-library">
-      <library name="craftbukkit.jar">
+      <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../powerparkour/craftbukkit.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/jetbrains/annotations/19.0.0/annotations-19.0.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -35,10 +35,12 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MAVEN_REPOSITORY$/org/jetbrains/annotations/19.0.0/annotations-19.0.0.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../servers/powerparkour/craftbukkit.jar!/" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/../../servers/powerparkour/craftbukkit.jar!/" />
+        </SOURCES>
       </library>
     </orderEntry>
   </component>

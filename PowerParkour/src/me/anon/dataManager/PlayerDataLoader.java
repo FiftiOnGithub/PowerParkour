@@ -29,7 +29,7 @@ public class PlayerDataLoader {
 			Integer chestPos = m.config.getInt("levels."+levelid+".chestPos");
 			String location = m.config.getString("levels."+levelid+".location");
 			long goldTime = m.config.getLong("levels."+levelid+".goldTime");
-			new ParkourLevel(name,condition,chestPos,location,goldTime);
+			new ParkourLevel(Integer.parseInt(levelid),name,condition,chestPos,location,goldTime);
 			System.out.println("Loaded level " + name + " with condition " + condition);
 		}
 		// player information
@@ -83,11 +83,13 @@ public class PlayerDataLoader {
 					System.out.println(cosmetics.size());
 				}
 				HashMap<String,ShopCosmetic> selections = new HashMap<String,ShopCosmetic>();
-				for (String entry : pdm.getConfig().getConfigurationSection("players."+i+".selections").getKeys(false)) {
-					String selection = pdm.getConfig().getString("players."+i+".selections."+entry);
-					System.out.println(entry + " found");
-					selections.put(entry,ShopCosmetic.valueOf(selection));
+				if (pdm.getConfig().get("players."+i+".selections") != null) {
+					for (String entry : pdm.getConfig().getConfigurationSection("players."+i+".selections").getKeys(false)) {
+						String selection = pdm.getConfig().getString("players."+i+".selections."+entry);
+						selections.put(entry,ShopCosmetic.valueOf(selection));
+					}
 				}
+
 
 
 				new ParkourPlayer(uuid,feats,plus,dailyLives,dailyStreak,dailyTime,lnn,cosmetics,coins,selections);
